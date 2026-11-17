@@ -1,5 +1,20 @@
 [
   {
+    "feito_em": "2026-11-17T18:19:13-03:00",
+    "titulo": "Serviços do Limpa Cano publicados no Google",
+    "resumo": "Os 15 serviços que você aprovou já estão no perfil do Limpa Cano no Google, e eu conferi lendo o perfil de volta.",
+    "itens": [
+      "15 serviços no ar: 13 em Desentupidora e 2 em Encanador, com os mesmos nomes e descrições que estavam no painel",
+      "O perfil não tinha nenhum serviço antes, então nada foi substituído",
+      "No painel, os 15 passaram de \"sugeridos\" para \"no perfil\", e a publicação ficou registrada no Histórico"
+    ],
+    "como_testar": "Abra Limpa Cano > Serviços no painel e veja a lista em \"No perfil\". No Google, procure o perfil e abra a aba de serviços.",
+    "pendente": "Faltam a descrição do perfil (tem o erro \"Londina\" e não cita os serviços) e a revisão das categorias. O Google pode levar um tempo para mostrar os serviços na busca.",
+    "tipo": "dados",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-17T18:06:34-03:00",
     "titulo": "Limpa Cano cadastrado, com 15 serviços sugeridos",
     "resumo": "Novo cliente no painel: Desentupidora e Encanador Limpa Cano, em Londrina. Os serviços que você descreveu nos áudios esperam a sua decisão.",
