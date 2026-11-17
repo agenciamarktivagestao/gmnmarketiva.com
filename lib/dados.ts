@@ -3,6 +3,9 @@ import path from "node:path";
 import { cache } from "react";
 import { modoDemonstracao } from "./ambiente";
 import { kindDemonstracao } from "./kinds";
+import { normalizarPerfil } from "./perfil";
+import type { PerfilLido } from "./perfil";
+import { perfilDemonstracao } from "./perfil-demo";
 import { supabaseServidor } from "./supabase";
 import type { Cliente, Conteudo, Diagnostico, Diretriz, Evento, Membro, Midia, Pendencia, Servico, Usuario } from "./tipos";
 
@@ -145,6 +148,19 @@ export async function listarEquipe(): Promise<Membro[]> {
   const { data, error } = await sb.from("equipe").select("email,nome,papel").order("criado_em");
   if (error) throw new Error(error.message);
   return (data as Membro[]) ?? [];
+}
+
+// A última leitura do perfil do Google de um cliente (null = a rotina ainda não gravou)
+export async function lerPerfil(cliente: Cliente, diagnostico?: Diagnostico): Promise<PerfilLido | null> {
+  if (modoDemonstracao()) return perfilDemonstracao(cliente, diagnostico);
+  const sb = await supabaseServidor();
+  const { data, error } = await sb.from("perfis_leitura").select("lido_em,dados").eq("cliente_id", cliente.id).maybeSingle();
+  if (error) {
+    // A prévia é um complemento: se a leitura falhar, a página continua com o resto
+    console.error("perfis_leitura:", error.message);
+    return null;
+  }
+  return data ? { lido_em: data.lido_em as string, dados: normalizarPerfil(data.dados) } : null;
 }
 
 // ---------------------------------------------------------------------------

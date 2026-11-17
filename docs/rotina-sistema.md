@@ -27,6 +27,12 @@ EXECUÇÃO do que a equipe aprovou (conta como ajuste, respeitando a meta e os L
 - conteudos aprovados: postagem → create_local_post com o texto (e a imagem da midia_id, se houver e o schema aceitar); resposta → reply_to_review com o review_id; se review_id for nulo, ache a avaliação por nome, estrelas e texto em get_data e só responda se achar uma única e ainda sem resposta. Depois update conteudos set status = 'publicado', publicado_em = now(). Se não conseguir, deixe 'aprovado' e anote em historico.
 - Aprovar no painel não dispensa os LIMITES: avaliações seguradas pelo dono continuam seguradas.
 
+PRÉVIA DO PERFIL (para a página de cada cliente no painel)
+- Depois de ler cada perfil no Windsor, grave uma foto dele: insert into perfis_leitura (cliente_id, lido_em, dados) values (<id do cliente>, now(), '<json>'::jsonb) on conflict (cliente_id) do update set lido_em = excluded.lido_em, dados = excluded.dados. Só uma linha por cliente; ela é sobrescrita a cada rodada.
+- O json tem estas chaves (todas opcionais; o painel mostra o que vier): titulo, categoria, categorias_extras (lista), endereco, telefone, site, mapa (link do Google Maps), descricao, horario (lista de {dia: seg|ter|qua|qui|sex|sab|dom, abre: "09:00", fecha: "18:00"}; aberto 24 horas = abre "00:00", fecha "24:00"), servicos (lista de nomes em português), area (lista de cidades), atributos (lista, em português, só os marcados como sim), atributos_total (número), links ({instagram, facebook, whatsapp, linkedin, appointment}), nota, total_avaliacoes, fotos (lista de {url, categoria: capa|fachada|foto, largura, altura, criada_em}; a url é media_thumbnail_url), fotos_janela_dias, avaliacoes (as mais recentes, até 5: {id, autor, estrelas 1 a 5, texto, data AAAA-MM-DD, resposta, resposta_em}), avaliacoes_janela_dias, posts (lista de {texto, data}).
+- Texto traduzido automaticamente pelo Google ("(Translated by Google)") pode ir como veio; o painel limpa na tela.
+- Cada pendência aparece na parte do perfil a que se refere. O painel descobre a parte pelo título; para não depender disso, grave payload.secao com uma destas chaves: fotos, nome, descricao, servicos, horario, area, atributos, avaliacoes, posts ou outras.
+
 REGISTRO no fim:
 - insert into execucoes (tipo, resumo) values ('madrugada' ou 'quarta_sexta', '<resumo curto>') returning id.
 - Para cada ação, insert into historico (cliente_id, execucao_id, tipo, resumo, detalhe, origem, ok) com tipo em foto, servico, categoria, resposta, post, area, descricao, analise ou outro; origem = 'rotina'; ok = false quando falhou.

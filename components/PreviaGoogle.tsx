@@ -11,7 +11,7 @@ type Props = {
   avaliacao?: string | null;
 };
 
-function Estrelas({ n }: { n: number }) {
+export function Estrelas({ n }: { n: number }) {
   return (
     <span className="previa-estrelas" role="img" aria-label={`${n} de 5 estrelas`}>
       {"★".repeat(n)}
