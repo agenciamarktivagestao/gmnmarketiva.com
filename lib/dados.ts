@@ -1,5 +1,6 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { cache } from "react";
-import seed from "@/data/seed.json";
 import { modoDemonstracao } from "./ambiente";
 import { supabaseServidor } from "./supabase";
 import type { Cliente, Diagnostico, Evento, Membro, Pendencia, Usuario } from "./tipos";
@@ -9,22 +10,32 @@ import type { Cliente, Diagnostico, Evento, Membro, Pendencia, Usuario } from ".
 // ---------------------------------------------------------------------------
 const DEMO_EM = "2026-11-16T21:00:00Z";
 
+type Seed = {
+  lido_em: string;
+  clientes: Omit<Cliente, "id">[];
+  diagnosticos: { slug: string; impressoes: number; ligacoes: number; rotas: number; cliques_site: number; campos: Diagnostico["campos"] }[];
+  pendencias: { slug: string | null; titulo: string; detalhe: string; prioridade: string; quem: string }[];
+};
+
+// Só é lido no modo demonstração; com o Supabase conectado o arquivo nem precisa existir.
+const lerSeed = cache((): Seed => JSON.parse(readFileSync(path.join(process.cwd(), "data", "seed.json"), "utf8")));
+
 function demoClientes(): Cliente[] {
-  return seed.clientes.map((c) => ({ ...c, id: `c-${c.slug}` }));
+  return lerSeed().clientes.map((c) => ({ ...c, id: `c-${c.slug}` }));
 }
 function demoDiagnosticos(): Diagnostico[] {
-  return seed.diagnosticos.map((d) => ({
+  return lerSeed().diagnosticos.map((d) => ({
     cliente_id: `c-${d.slug}`,
-    lido_em: seed.lido_em,
+    lido_em: lerSeed().lido_em,
     impressoes: d.impressoes,
     ligacoes: d.ligacoes,
     rotas: d.rotas,
     cliques_site: d.cliques_site,
-    campos: d.campos as Diagnostico["campos"],
+    campos: d.campos,
   }));
 }
 function demoPendencias(): Pendencia[] {
-  return seed.pendencias.map((p, i) => ({
+  return lerSeed().pendencias.map((p, i) => ({
     id: `p-${i + 1}`,
     cliente_id: p.slug ? `c-${p.slug}` : null,
     titulo: p.titulo,
