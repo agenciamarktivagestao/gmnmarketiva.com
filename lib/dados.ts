@@ -3,11 +3,12 @@ import path from "node:path";
 import { cache } from "react";
 import { modoDemonstracao } from "./ambiente";
 import { kindDemonstracao } from "./kinds";
+import { normalizarMudancas } from "./mudancas";
 import { normalizarPerfil } from "./perfil";
 import type { PerfilLido } from "./perfil";
 import { perfilDemonstracao } from "./perfil-demo";
 import { supabaseServidor } from "./supabase";
-import type { Cliente, Conteudo, Diagnostico, Diretriz, Evento, Membro, Midia, Pendencia, Servico, Usuario } from "./tipos";
+import type { Cliente, Conteudo, Diagnostico, Diretriz, Evento, Membro, Midia, Mudanca, Pendencia, Servico, Usuario } from "./tipos";
 
 // ---------------------------------------------------------------------------
 // Modo demonstração: dados da leitura de 16/11/2026, só em memória
@@ -149,6 +150,52 @@ export async function listarEquipe(): Promise<Membro[]> {
   if (error) throw new Error(error.message);
   return (data as Membro[]) ?? [];
 }
+
+// O registro de mudanças. No modo demonstração vem de data/mudancas.json; com o Supabase, da tabela mudancas_sistema.
+export async function listarMudancas(): Promise<Mudanca[]> {
+  if (modoDemonstracao()) return normalizarMudancas(JSON.parse(readFileSync(path.join(process.cwd(), "data", "mudancas.json"), "utf8")));
+  const sb = await supabaseServidor();
+  const { data, error } = await sb
+    .from("mudancas_sistema")
+    .select("id,feito_em,titulo,resumo,itens,como_testar,pendente,tipo,commit_sha,autor")
+    .order("feito_em", { ascending: false })
+    .limit(200);
+  if (error) {
+    // O registro é um complemento: se falhar, o resto do painel continua
+    console.error("mudancas_sistema:", error.message);
+    return [];
+  }
+  return normalizarMudancas(data);
+}
+
+// Até quando esta pessoa já viu as novidades (null = nunca abriu)
+export async function lerVistoAte(email: string): Promise<string | null> {
+  if (modoDemonstracao()) return "2026-11-18T00:00:00Z"; // na demonstração nada aparece como novo
+  const sb = await supabaseServidor();
+  const { data, error } = await sb.from("mudancas_vistas").select("visto_ate").eq("email", email).maybeSingle();
+  if (error) {
+    console.error("mudancas_vistas:", error.message);
+    return "9999-12-31T00:00:00Z"; // se não der para ler, não mostra selo em vez de mostrar tudo como novo
+  }
+  return data?.visto_ate ?? null;
+}
+
+// Quantas novidades esta pessoa ainda não viu (para o selo do menu). Nunca derruba o layout.
+export const contarNovidadesNaoVistas = cache(async (email: string): Promise<number> => {
+  if (modoDemonstracao()) return 0;
+  try {
+    const sb = await supabaseServidor();
+    const visto = await lerVistoAte(email);
+    let consulta = sb.from("mudancas_sistema").select("id", { count: "exact", head: true });
+    if (visto) consulta = consulta.gt("feito_em", visto);
+    const { count, error } = await consulta;
+    if (error) throw new Error(error.message);
+    return count ?? 0;
+  } catch (e) {
+    console.error("novidades não vistas:", e instanceof Error ? e.message : e);
+    return 0;
+  }
+});
 
 // A última leitura do perfil do Google de um cliente (null = a rotina ainda não gravou)
 export async function lerPerfil(cliente: Cliente, diagnostico?: Diagnostico): Promise<PerfilLido | null> {

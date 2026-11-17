@@ -4,7 +4,7 @@ import { Logo } from "@/components/Logo";
 import { NavLinks } from "@/components/NavLinks";
 import { sair } from "@/app/actions";
 import { modoDemonstracao } from "@/lib/ambiente";
-import { usuarioAtual } from "@/lib/dados";
+import { contarNovidadesNaoVistas, usuarioAtual } from "@/lib/dados";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +29,8 @@ export default async function LayoutPainel({ children }: { children: React.React
     );
   }
 
+  const novidades = await contarNovidadesNaoVistas(usuario.email);
+
   return (
     <>
       {modoDemonstracao() && (
@@ -43,7 +45,7 @@ export default async function LayoutPainel({ children }: { children: React.React
             Perfis
           </span>
         </Link>
-        <NavLinks />
+        <NavLinks novidades={novidades} />
         <div className="topo-usuario">
           <span title={usuario.email}>{usuario.email.split("@")[0]}</span>
           {!modoDemonstracao() && (

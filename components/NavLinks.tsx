@@ -10,9 +10,10 @@ const LINKS = [
   { href: "/diretrizes", nome: "Diretrizes" },
   { href: "/historico", nome: "Histórico" },
   { href: "/equipe", nome: "Equipe" },
+  { href: "/novidades", nome: "Novidades" },
 ];
 
-export function NavLinks() {
+export function NavLinks({ novidades = 0 }: { novidades?: number }) {
   const atual = usePathname();
   return (
     <nav aria-label="Principal" className="nav">
@@ -21,6 +22,14 @@ export function NavLinks() {
         return (
           <Link key={l.href} href={l.href} aria-current={ativo ? "page" : undefined}>
             {l.nome}
+            {l.href === "/novidades" && novidades > 0 && (
+              <>
+                <span className="nav-selo" aria-hidden="true">
+                  {novidades}
+                </span>
+                <span className="sr-only"> ({novidades === 1 ? "1 nova" : `${novidades} novas`})</span>
+              </>
+            )}
           </Link>
         );
       })}

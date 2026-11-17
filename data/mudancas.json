@@ -1,0 +1,202 @@
+[
+  {
+    "feito_em": "2026-11-17T18:10:00-03:00",
+    "titulo": "Registro de mudanças no painel",
+    "resumo": "Cada ajuste que eu fizer no sistema passa a aparecer aqui, com data, o que mudou, como conferir e o que ainda falta.",
+    "itens": [
+      "Página Novidades no menu, com o mais recente primeiro",
+      "Cada novidade abre e fecha ao tocar, com uma setinha à direita",
+      "Um selo azul no menu mostra quantas novidades você ainda não viu e some depois que você abre a página",
+      "No celular, onde o menu rola de lado, um aviso no topo do Painel diz quantas novidades você ainda não viu",
+      "Cada novidade diz o tipo (painel, dados ou rotina), como conferir e o que está pendente",
+      "Banco: duas tabelas novas, o registro e o controle do que cada pessoa já viu"
+    ],
+    "como_testar": "Abra Novidades no menu. O selo no menu deve sumir depois que a página abrir. No celular, o aviso no topo do Painel leva à mesma página.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T17:03:54-03:00",
+    "titulo": "Painel inicial mais simples: lista de clientes",
+    "resumo": "A tela inicial passou a ter um só caminho: o que fazer, e a lista dos clientes com o que falta em cada um.",
+    "itens": [
+      "O título diz quantas decisões esperam por você, e o botão \"Decidir uma por vez\" fica logo abaixo",
+      "Cada cliente é uma linha: o que falta e o que está a rever, escritos em palavras, e quantas decisões esperam",
+      "Quem tem mais decisões esperando aparece primeiro; \"Ordem alfabética\" troca a ordem",
+      "Tocar no cliente abre o perfil dele para decidir ali",
+      "A tabela de bolinhas continua, recolhida em \"Comparar todos os perfis numa tabela\"",
+      "Saiu a coluna \"Primeiras da fila\", que repetia o que a lista já mostra"
+    ],
+    "como_testar": "Abra o Painel em computador e celular e toque num cliente.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "7e506d2",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T16:51:38-03:00",
+    "titulo": "O que falta neste perfil, abaixo da prévia",
+    "resumo": "Na página de cada cliente, logo abaixo do cartão do Google, uma lista do que falta ou está a rever.",
+    "itens": [
+      "Cada linha mostra o campo, o valor lido e a pendência aberta que explica o problema",
+      "Tocar numa linha leva à parte do perfil onde a pendência está",
+      "Quando nada falta, o painel diz isso",
+      "A coluna da esquerda deixou de ficar fixa na rolagem, porque ficou mais alta que a tela"
+    ],
+    "como_testar": "Abra qualquer cliente e veja o bloco \"O que falta neste perfil\" abaixo do cartão.",
+    "pendente": "Os valores vêm do diagnóstico da rotina (por exemplo \"0\" ou \"Vertical\") e são curtos de propósito; a pendência abaixo de cada um dá o motivo.",
+    "tipo": "painel",
+    "commit_sha": "46d57bc",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T16:50:38-03:00",
+    "titulo": "Nova identidade visual: preto, azul e branco",
+    "resumo": "O painel trocou as cores de barra vinho, fundo off-white e botões verdes por preto, azul e branco.",
+    "itens": [
+      "Barra do topo preta (a logo continua branca), fundo branco, botões e links azuis",
+      "O estado de cada campo não depende só de cor: cheio azul é em ordem, meio preto é a rever, vazio preto é falta",
+      "Prioridade na borda do card: preta e grossa é alta, azul é média, cinza e fina é baixa",
+      "Vermelho só aparece em erro de verdade, como falha ao gravar",
+      "A prévia do Google continua com as cores do Google, de propósito"
+    ],
+    "como_testar": "Abra Painel, Pendências e um cliente em computador e celular.",
+    "pendente": "O contraste do azul e do vermelho foi calculado, falta conferir com um leitor de contraste no navegador.",
+    "tipo": "painel",
+    "commit_sha": "9e98036",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T16:32:14-03:00",
+    "titulo": "Painel e Pendências mais simples",
+    "resumo": "O Painel passou a começar pelo que fazer, e a lista de Pendências ganhou filtros recolhidos.",
+    "itens": [
+      "Painel: o título diz o que fazer e o botão \"Decidir uma por vez\" fica à vista",
+      "Pendências: texto de abertura de uma linha e dica de teclado só onde há teclado",
+      "Pendências: os filtros ficam num botão \"Filtros\", com os que estão em uso ao lado e \"Limpar filtros\"",
+      "Abas com os mesmos nomes das etiquetas: Esperam você, A rotina faz, Chrome ou plano pago",
+      "Cada bolinha da tabela do Painel leva à parte certa do perfil do cliente"
+    ],
+    "como_testar": "Abra Pendências, clique em \"Filtros\", escolha \"Alta\" e depois \"Limpar filtros\".",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "333b973",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T16:19:53-03:00",
+    "titulo": "Prévia do perfil de cada cliente",
+    "resumo": "A página do cliente mostra o perfil como o Google mostra, com as pendências de cada parte logo abaixo dela.",
+    "itens": [
+      "Cartão no estilo do Google: capa, nome, nota, endereço, horário, ligar, rota e site",
+      "Os números dos últimos 30 dias: impressões, ligações, pedidos de rota e cliques no site",
+      "Cada parte do perfil (fotos, nome, descrição, serviços, horário, área, atributos, avaliações, postagens) com a situação e as pendências dela",
+      "As mesmas ações de antes: aprovar, recusar, marcar como feito e comentar",
+      "Banco: tabela nova com a última leitura de cada perfil"
+    ],
+    "como_testar": "Abra um cliente no Painel e toque numa parte do perfil para abrir e fechar.",
+    "pendente": "A rotina ainda não grava a leitura do perfil sozinha: precisa do conector do Supabase. O Google de teste só devolve fotos e avaliações dos últimos 30 dias.",
+    "tipo": "painel",
+    "commit_sha": "f20a8ae",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T16:10:00-03:00",
+    "titulo": "Leitura dos 15 perfis gravada no banco",
+    "resumo": "Os dados dos perfis dos 15 clientes, lidos do Google em 17/11/2026, foram gravados para a prévia usar.",
+    "itens": [
+      "Nome, categorias, endereço, horário, serviços, área, atributos, fotos e avaliações recentes de cada cliente",
+      "Conferido por soma de verificação: 15 de 15 gravados"
+    ],
+    "como_testar": "Abra qualquer cliente: o cartão do Google deve mostrar os dados dele.",
+    "pendente": "Os dados só se atualizam quando as rotinas passarem a gravar no banco.",
+    "tipo": "dados",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T14:45:33-03:00",
+    "titulo": "Fase 5: triagem, uma pendência por vez",
+    "resumo": "Tela nova para decidir as pendências em sequência, com atalhos de teclado.",
+    "itens": [
+      "Pendências > \"Decidir uma por vez\": só as abertas, das mais urgentes e antigas para as mais recentes",
+      "Atalhos: A aprova, R recusa, C comenta, S pula, Z desfaz",
+      "O próximo card aparece na hora; \"Desfazer\" devolve a pendência para aberta",
+      "Barra de progresso (\"12 de 28\") e tempo estimado",
+      "No celular: botões grandes fixos no rodapé e sem a dica de teclado"
+    ],
+    "como_testar": "Abra Pendências > \"Decidir uma por vez\" no celular e no computador.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "ad0833d",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T14:32:52-03:00",
+    "titulo": "Fase 4: avaliações dentro da pendência",
+    "resumo": "Quem responde avaliações agora faz isso dentro do card, avaliação por avaliação.",
+    "itens": [
+      "Cada avaliação mostra a nota, o texto, há quantos dias está sem resposta e uma resposta sugerida que você pode editar",
+      "\"Publicar resposta\" grava a resposta como aprovada; \"Pedir revisão ao Google\" só registra a decisão",
+      "A pendência fecha quando todas as avaliações têm uma ação",
+      "No celular a caixa de resposta cresce com o texto, sem cortar"
+    ],
+    "como_testar": "Abra uma pendência de avaliações sem resposta e escreva uma resposta.",
+    "pendente": "As rotinas ainda precisam ser atualizadas para ler essas respostas (instruções em docs/rotina-sistema.md).",
+    "tipo": "painel",
+    "commit_sha": "78e1e00",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T14:26:48-03:00",
+    "titulo": "Fase 3: cada pendência com a ação certa",
+    "resumo": "Cada pendência mostra só o que faz sentido: aprovar, escolher, preencher, enviar foto ou marcar como feito.",
+    "itens": [
+      "Escolha com opções e \"outro\"; dados com cidades, horário por dia e texto; foto com área de soltar e prévia",
+      "Foto de capa: o painel recusa foto em pé ou quadrada e avisa se fugir do formato 16:9",
+      "A resposta fica gravada e a rotina recebe um comentário \"Resposta pelo painel\"",
+      "Recusar, Marcar como feito e Comentar viraram botões discretos",
+      "Banco: colunas novas e opcionais em pendências; nada existente foi alterado"
+    ],
+    "como_testar": "Abra Pendências e responda uma pendência de escolha e uma de foto.",
+    "pendente": "A rotina continua lendo status e comentários como antes.",
+    "tipo": "painel",
+    "commit_sha": "d62c8f8",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T14:16:36-03:00",
+    "titulo": "Fase 2: pendências iguais viram um card só",
+    "resumo": "Pendências com o mesmo título aparecem juntas, e dá para decidir todas de uma vez.",
+    "itens": [
+      "Exemplo: \"8 perfis\" em um só card, com a lista de perfis que se abre",
+      "Decidir para todos ou só para os marcados; cada perfil mantém as suas ações",
+      "\"Mostrar separadas\" volta à lista sem agrupar"
+    ],
+    "como_testar": "Em Pendências, abra um card com vários perfis e aprove só alguns.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "be3ab38",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T14:01:06-03:00",
+    "titulo": "Fase 1: filtros, abas e etiquetas mais claras",
+    "resumo": "Arrumei os filtros que estavam quebrados e deixei Pendências abrir no que depende de você.",
+    "itens": [
+      "Filtros de Pendências de novo em linhas organizadas",
+      "Abas em Pendências com a contagem de cada uma",
+      "Cards sem etiquetas repetidas: a prioridade aparece na borda do card",
+      "O Painel esconde contadores que estão em zero",
+      "Datas do Histórico em minúsculas, como \"terça-feira, 17 de novembro\"",
+      "Na tabela do Painel, cada bolinha leva às pendências daquele campo"
+    ],
+    "como_testar": "Abra Pendências: ela deve abrir na aba de quem depende de você, com os números.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "1a3ba0b",
+    "autor": "Claude"
+  }
+]

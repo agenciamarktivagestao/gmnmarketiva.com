@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Fase } from "@/components/Fase";
 import { Matriz } from "@/components/Matriz";
 import {
+  contarNovidadesNaoVistas,
   listarClientes,
   listarConteudos,
   listarDiagnosticos,
@@ -9,6 +10,7 @@ import {
   listarMidias,
   listarPendencias,
   listarServicos,
+  usuarioAtual,
 } from "@/lib/dados";
 import { CAMPOS, dataCurta, estaAberta } from "@/lib/rotulos";
 
@@ -17,6 +19,8 @@ const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um :
 export default async function Painel({ searchParams }: { searchParams: Promise<{ ordem?: string }> }) {
   const busca = await searchParams;
   const porNome = busca.ordem === "nome";
+  const usuario = await usuarioAtual();
+  const novidades = usuario ? await contarNovidadesNaoVistas(usuario.email) : 0;
   const [clientes, diagnosticos, pendencias, conteudos, midias, servicos, diretrizes] = await Promise.all([
     listarClientes(),
     listarDiagnosticos(),
@@ -95,6 +99,14 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
 
   return (
     <>
+      {novidades > 0 && (
+        <p className="aviso-novidades">
+          <span>
+            {novidades === 1 ? "1 novidade no sistema desde a sua última visita." : `${novidades} novidades no sistema desde a sua última visita.`}
+          </span>
+          <Link href="/novidades">Ver o que mudou</Link>
+        </p>
+      )}
       <section className="abertura">
         <h1>
           {esperam.length === 0

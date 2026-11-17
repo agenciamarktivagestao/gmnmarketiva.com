@@ -87,6 +87,21 @@ export type Evento = {
   ocorreu_em: string;
 };
 
+// Uma linha do registro de mudanças (/novidades)
+export type TipoMudanca = "painel" | "dados" | "rotina";
+export type Mudanca = {
+  id: string;
+  feito_em: string;
+  titulo: string;
+  resumo: string;
+  itens: string[];
+  como_testar: string | null;
+  pendente: string | null;
+  tipo: TipoMudanca;
+  commit_sha: string | null;
+  autor: string;
+};
+
 export type Membro = { email: string; nome: string | null; papel: Papel };
 export type Usuario = { email: string; papel: Papel | null };
 

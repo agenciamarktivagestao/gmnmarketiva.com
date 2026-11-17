@@ -20,6 +20,20 @@ function atualizar() {
 }
 
 // ---------------------------------------------------------------------------
+// Novidades: marca como vistas (é o que apaga o selo do menu)
+// ---------------------------------------------------------------------------
+export async function marcarNovidadesVistas(): Promise<void> {
+  if (modoDemonstracao()) return;
+  const sb = await supabaseServidor();
+  const { data } = await sb.auth.getUser();
+  const email = data.user?.email?.toLowerCase();
+  if (!email) return;
+  const { error } = await sb.from("mudancas_vistas").upsert({ email, visto_ate: new Date().toISOString() });
+  if (error) console.error("mudancas_vistas:", error.message);
+  else atualizar();
+}
+
+// ---------------------------------------------------------------------------
 // Entrar e sair
 // ---------------------------------------------------------------------------
 export async function entrar(_: Resultado | null, dados: FormData): Promise<Resultado> {
