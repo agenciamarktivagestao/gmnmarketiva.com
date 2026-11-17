@@ -76,6 +76,25 @@ export async function decidir(id: string, status: string): Promise<Resultado> {
   return { ok: true };
 }
 
+// Decisão em grupo: cada pendência recebe a sua própria decisão (uma linha atualizada por id,
+// com o gatilho gravando decidido_por, decidido_em e o histórico de cada uma).
+// `de` é o status em que o card foi mostrado: quem já mudou por outro caminho não é sobrescrito.
+export async function decidirVarias(ids: string[], status: string, de: string): Promise<Resultado & { feitas?: number }> {
+  if (modoDemonstracao()) return DEMO;
+  if (!(STATUS as readonly string[]).includes(status) || !(STATUS as readonly string[]).includes(de)) return { erro: "Status inválido." };
+  const lista = [...new Set(ids)].filter((i) => /^[0-9a-f-]{36}$/i.test(i)).slice(0, 100);
+  if (!lista.length) return { erro: "Escolha ao menos uma pendência." };
+  const sb = await supabaseServidor();
+  const { data, error } = await sb.from("pendencias").update({ status }).in("id", lista).eq("status", de).select("id");
+  if (error) return { erro: error.message };
+  if (!data?.length) return { erro: "Sem permissão ou as pendências já mudaram. Atualize a página." };
+  atualizar();
+  if (data.length < lista.length) {
+    return { erro: `${data.length} de ${lista.length} foram atualizadas. As outras já tinham mudado.`, feitas: data.length };
+  }
+  return { ok: true, feitas: data.length };
+}
+
 export async function comentar(id: string, texto: string): Promise<Resultado> {
   if (modoDemonstracao()) return DEMO;
   const limpo = texto.trim();

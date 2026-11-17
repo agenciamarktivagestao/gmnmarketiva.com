@@ -29,6 +29,9 @@ export type Diagnostico = {
 
 export type Comentario = { id: string; pendencia_id: string; autor: string; texto: string; criado_em: string };
 
+// Tipo de resposta que a pendência pede. Sem `kind` (pendências antigas), vale "approve".
+export type Kind = "approve" | "choose" | "input" | "upload" | "external";
+
 export type Pendencia = {
   id: string;
   cliente_id: string | null;
@@ -38,6 +41,9 @@ export type Pendencia = {
   quem: Quem;
   status: Status;
   origem: string;
+  kind?: Kind | null;
+  payload?: Record<string, unknown> | null;
+  resposta?: Record<string, unknown> | null;
   decidido_por: string | null;
   decidido_em: string | null;
   criado_em: string;

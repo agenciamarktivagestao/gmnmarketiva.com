@@ -1,14 +1,16 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { FormNovaPendencia } from "@/components/FormNovaPendencia";
+import { GrupoPendencias } from "@/components/GrupoPendencias";
 import { ItemPendencia } from "@/components/ItemPendencia";
+import { agrupar } from "@/lib/agrupar";
 import { camposDaPendencia } from "@/lib/campos";
 import { listarClientes, listarPendencias, usuarioAtual } from "@/lib/dados";
 import { CAMPOS, QUEM_ABA, ordenarPendencias } from "@/lib/rotulos";
 
 export const metadata: Metadata = { title: "Pendências" };
 
-type Busca = { quem?: string; prioridade?: string; status?: string; cliente?: string; campo?: string };
+type Busca = { quem?: string; prioridade?: string; status?: string; cliente?: string; campo?: string; agrupar?: string };
 
 const ABAS = [
   { valor: "voce", nome: QUEM_ABA.voce },
@@ -61,6 +63,11 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
     todas: base.length,
   };
   const filtradas = ordenarPendencias(base.filter((p) => quem === "todas" || p.quem === quem));
+  // Pendências iguais viram um card só; "agrupar=0" na URL mostra cada uma separada
+  const agruparIguais = busca.agrupar !== "0";
+  const entradas = agruparIguais ? agrupar(filtradas) : filtradas.map((p) => ({ tipo: "item" as const, p }));
+  const grupos = entradas.filter((e) => e.tipo === "grupo").length;
+  const clientesPorId = Object.fromEntries(clientes.map((c) => [c.id, { slug: c.slug, nome: c.nome }]));
 
   const href = (mudar: Partial<Busca>) => {
     const novo = { ...busca, ...mudar };
@@ -122,6 +129,23 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
             </ul>
           </div>
         )}
+        <div className="filtro">
+          <p className="filtro-nome" id="f-agrupar">
+            Pendências iguais
+          </p>
+          <ul aria-labelledby="f-agrupar">
+            <li>
+              <Link href={href({ agrupar: "" })} className="chip" aria-current={agruparIguais ? "true" : undefined}>
+                Agrupar
+              </Link>
+            </li>
+            <li>
+              <Link href={href({ agrupar: "0" })} className="chip" aria-current={!agruparIguais ? "true" : undefined}>
+                Mostrar separadas
+              </Link>
+            </li>
+          </ul>
+        </div>
         {grupo("Prioridade", "prioridade", PRIO_OPC, busca.prioridade ?? "")}
         {grupo("Situação", "status", STATUS_OPC, status)}
         <div className="filtro">
@@ -152,14 +176,19 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
 
       <p className="contagem" aria-live="polite">
         {filtradas.length} {filtradas.length === 1 ? "pendência" : "pendências"}
+        {grupos > 0 && `, em ${entradas.length} cards (${grupos} ${grupos === 1 ? "grupo" : "grupos"} de pendências iguais)`}
       </p>
       {filtradas.length === 0 ? (
         <p className="vazio">Nenhuma pendência com esses filtros. Troque a aba, a situação ou o cliente para ver mais.</p>
       ) : (
         <ul className="lista-pend lista-larga">
-          {filtradas.map((p) => (
-            <ItemPendencia key={p.id} p={p} cliente={p.cliente_id ? porId.get(p.cliente_id) : undefined} podeEditar={podeEditar} />
-          ))}
+          {entradas.map((e) =>
+            e.tipo === "grupo" ? (
+              <GrupoPendencias key={e.chave} titulo={e.titulo} itens={e.itens} clientes={clientesPorId} podeEditar={podeEditar} />
+            ) : (
+              <ItemPendencia key={e.p.id} p={e.p} cliente={e.p.cliente_id ? porId.get(e.p.cliente_id) : undefined} podeEditar={podeEditar} />
+            ),
+          )}
         </ul>
       )}
     </>
