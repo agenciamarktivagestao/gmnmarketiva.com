@@ -6,6 +6,8 @@ import { headers } from "next/headers";
 import { modoDemonstracao } from "@/lib/ambiente";
 import { supabaseServidor } from "@/lib/supabase";
 import type { Resultado } from "@/lib/acoes-tipos";
+import { conferirEntrada, conferirEscolha, type Conferida, type Resposta } from "@/lib/respostas";
+import type { PayloadChoose, PayloadInput } from "@/lib/tipos";
 
 const DEMO: Resultado = { erro: "Modo demonstração: conecte o Supabase para salvar." };
 const STATUS = ["aberta", "aprovada", "recusada", "concluida"] as const;
@@ -93,6 +95,45 @@ export async function decidirVarias(ids: string[], status: string, de: string): 
     return { erro: `${data.length} de ${lista.length} foram atualizadas. As outras já tinham mudado.`, feitas: data.length };
   }
   return { ok: true, feitas: data.length };
+}
+
+// Resposta a uma pendência que pede escolha, dado ou foto. Segue o mesmo contrato com a rotina:
+// o status vira "aprovada" (a rotina pode executar), o texto da resposta entra como comentário
+// e o valor estruturado fica em `resposta`. O servidor confere tudo contra o `payload` da pendência.
+export async function responder(id: string, r: Resposta): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  const sb = await supabaseServidor();
+  const { data: p, error: e0 } = await sb.from("pendencias").select("kind,payload,status,cliente_id").eq("id", id).maybeSingle();
+  if (e0 || !p) return { erro: "Pendência não encontrada." };
+  if (p.status !== "aberta") return { erro: "Esta pendência já foi decidida. Reabra para responder de novo." };
+  if (p.kind !== r.tipo) return { erro: "Esta pendência pede outro tipo de resposta." };
+
+  let conferida: Conferida;
+  if (r.tipo === "choose") conferida = conferirEscolha((p.payload ?? {}) as PayloadChoose, r);
+  else if (r.tipo === "input") conferida = conferirEntrada((p.payload ?? {}) as PayloadInput, r.campo, r.valor);
+  else {
+    const ids = [...new Set(r.midias)].filter((i) => /^[0-9a-f-]{36}$/i.test(i)).slice(0, 12);
+    if (!p.cliente_id || !ids.length) return { erro: "Envie ao menos uma foto." };
+    const { data: fotos } = await sb.from("midias").select("id,categoria").in("id", ids).eq("cliente_id", p.cliente_id).eq("status", "na_fila");
+    if (!fotos?.length) return { erro: "Não encontrei as fotos enviadas. Tente de novo." };
+    const capas = fotos.filter((f) => f.categoria === "COVER").length;
+    const partes = [capas ? `${capas} ${capas === 1 ? "capa horizontal" : "capas"}` : "", fotos.length - capas ? `${fotos.length - capas} ${fotos.length - capas === 1 ? "foto" : "fotos"} para a galeria` : ""].filter(Boolean);
+    conferida = { valor: { midias: fotos.map((f) => f.id) }, resumo: `Enviei ${partes.join(" e ")}. Estão na fila para o Google.` };
+  }
+  if ("erro" in conferida) return { erro: conferida.erro };
+
+  const resposta = { tipo: r.tipo, valor: conferida.valor, resumo: conferida.resumo, em: new Date().toISOString() };
+  const { data, error } = await sb.from("pendencias").update({ status: "aprovada", resposta }).eq("id", id).eq("status", "aberta").select("id");
+  if (error) return { erro: error.message };
+  if (!data?.length) return { erro: "Sem permissão ou a pendência já mudou. Atualize a página." };
+
+  const { data: u } = await sb.auth.getUser();
+  const { error: e2 } = await sb
+    .from("comentarios")
+    .insert({ pendencia_id: id, texto: `Resposta pelo painel: ${conferida.resumo}`.slice(0, 2000), autor: u.user?.email ?? "equipe" });
+  atualizar();
+  if (e2) return { erro: "A resposta foi salva, mas o comentário para a rotina falhou. Comente de novo com o que você respondeu." };
+  return { ok: true };
 }
 
 export async function comentar(id: string, texto: string): Promise<Resultado> {
@@ -270,14 +311,14 @@ export async function apagarServico(id: string): Promise<Resultado> {
 export async function registrarMidia(
   clienteId: string,
   m: { caminho: string; url: string; nome: string; largura: number; altura: number; bytes: number; categoria: string; nota?: string },
-): Promise<Resultado> {
+): Promise<Resultado & { id?: string }> {
   if (modoDemonstracao()) return DEMO;
   if (!m.caminho.startsWith(`${clienteId}/`) || m.caminho.includes("..")) return { erro: "Caminho de arquivo inválido." };
   const categoria = ["ADDITIONAL", "COVER"].includes(m.categoria) ? m.categoria : "ADDITIONAL";
   if (categoria === "COVER" && m.largura <= m.altura) return { erro: "A capa precisa ser uma foto horizontal." };
   const sb = await supabaseServidor();
   const { data: u } = await sb.auth.getUser();
-  const { error } = await sb.from("midias").insert({
+  const { data: criada, error } = await sb.from("midias").insert({
     cliente_id: clienteId,
     caminho: m.caminho,
     url: m.url,
@@ -288,10 +329,10 @@ export async function registrarMidia(
     categoria,
     nota: m.nota?.trim().slice(0, 300) || null,
     criado_por: u.user?.email ?? null,
-  });
-  if (error) return { erro: "Sem permissão para registrar a imagem." };
+  }).select("id").single();
+  if (error || !criada) return { erro: "Sem permissão para registrar a imagem." };
   atualizar();
-  return { ok: true };
+  return { ok: true, id: criada.id };
 }
 
 export async function retirarMidia(id: string): Promise<Resultado> {

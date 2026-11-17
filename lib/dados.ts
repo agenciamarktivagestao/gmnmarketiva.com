@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { cache } from "react";
 import { modoDemonstracao } from "./ambiente";
+import { kindDemonstracao } from "./kinds";
 import { supabaseServidor } from "./supabase";
 import type { Cliente, Conteudo, Diagnostico, Diretriz, Evento, Membro, Midia, Pendencia, Servico, Usuario } from "./tipos";
 
@@ -36,6 +37,7 @@ function demoDiagnosticos(): Diagnostico[] {
 }
 function demoPendencias(): Pendencia[] {
   return lerSeed().pendencias.map((p, i) => ({
+    ...kindDemonstracao(p.titulo, p.quem, p.slug),
     id: `p-${i + 1}`,
     cliente_id: p.slug ? `c-${p.slug}` : null,
     titulo: p.titulo,
@@ -115,7 +117,7 @@ export async function listarPendencias(): Promise<Pendencia[]> {
   const { data, error } = await sb
     .from("pendencias")
     .select(
-      "id,cliente_id,titulo,detalhe,prioridade,quem,status,origem,decidido_por,decidido_em,criado_em,comentarios(id,pendencia_id,autor,texto,criado_em)",
+      "id,cliente_id,titulo,detalhe,prioridade,quem,status,origem,kind,payload,resposta,decidido_por,decidido_em,criado_em,comentarios(id,pendencia_id,autor,texto,criado_em)",
     )
     .order("criado_em");
   if (error) throw new Error(error.message);

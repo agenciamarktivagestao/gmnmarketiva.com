@@ -16,8 +16,10 @@ export function ItemPendencia({
 }) {
   // "Depende de você" é o caso comum e não vira etiqueta; só as exceções aparecem.
   const excecao = p.quem !== "voce";
+  // Perguntas que pedem escolha, dado ou foto precisam de mais largura que um botão
+  const larga = p.status === "aberta" && podeEditar && (p.kind === "choose" || p.kind === "input" || p.kind === "upload");
   return (
-    <li className={`pend pend-${p.prioridade} pend-${p.status}`}>
+    <li className={`pend pend-${p.prioridade} pend-${p.status}${larga ? " pend-larga" : ""}`}>
       <div className="pend-corpo">
         {mostrarCliente && (
           <p className="pend-cliente">
@@ -30,6 +32,11 @@ export function ItemPendencia({
           <span className="sr-only">. Prioridade {PRIORIDADE[p.prioridade].toLowerCase()}.</span>
         </h3>
         {p.detalhe && <p className="pend-detalhe">{p.detalhe}</p>}
+        {p.resposta?.resumo && p.status !== "aberta" && (
+          <p className="pend-resposta">
+            <strong>Resposta:</strong> {p.resposta.resumo}
+          </p>
+        )}
         {(excecao || p.status !== "aberta") && (
           <p className="pend-meta">
             {excecao && <span className="etiqueta">{QUEM[p.quem]}</span>}
@@ -42,7 +49,7 @@ export function ItemPendencia({
           </p>
         )}
       </div>
-      <AcoesPendencia id={p.id} status={p.status} comentarios={p.comentarios} podeEditar={podeEditar} />
+      <AcoesPendencia p={p} podeEditar={podeEditar} />
     </li>
   );
 }

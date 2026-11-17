@@ -490,6 +490,7 @@ h3 {
 .pend-corpo {
   display: grid;
   gap: 0.3rem;
+  align-content: start;
 }
 .pend-cliente {
   font-size: 0.82rem;
@@ -1419,6 +1420,178 @@ label {
   color: var(--tinta-suave);
 }
 
+/* ---------- Respostas dentro da pendência (escolha, dado, foto, fora do painel) ---------- */
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  padding: 0;
+  accent-color: var(--cafezal);
+}
+.acoes-sec {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.4rem;
+}
+.lista-larga .pend-larga {
+  grid-template-columns: minmax(0, 1fr);
+}
+.pend-resposta {
+  max-width: 70ch;
+  padding: 0.4rem 0.7rem;
+  border-left: 3px solid var(--cafezal);
+  background: var(--papel);
+  font-size: 0.92rem;
+}
+.decisao {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 42rem;
+}
+.decisao-grupo {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.decisao-grupo legend,
+.decisao-pergunta {
+  padding: 0 0 0.35rem;
+  font-weight: 600;
+}
+.decisao-dica {
+  font-weight: 400;
+  color: var(--tinta-suave);
+}
+.opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--linha-forte);
+  border-radius: var(--raio);
+  background: var(--papel);
+  font-weight: 400;
+  cursor: pointer;
+}
+.opcao:hover {
+  border-color: var(--tinta);
+}
+.opcao-marcada {
+  border-color: var(--cafezal);
+  box-shadow: inset 0 0 0 1px var(--cafezal);
+}
+.opcao input {
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.1rem;
+}
+.opcao span {
+  display: grid;
+  gap: 0.1rem;
+}
+.opcao strong {
+  font-weight: 560;
+}
+.opcao small {
+  color: var(--tinta-suave);
+  font-size: 0.84rem;
+}
+.cidades-linha {
+  display: flex;
+  gap: 0.5rem;
+}
+.cidades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.cidades li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.1rem 0.2rem 0.1rem 0.7rem;
+  border: 1px solid var(--cafezal);
+  border-radius: 999px;
+  background: var(--papel);
+}
+.cidades button {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tinta-suave);
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.cidades button:hover {
+  color: var(--terra);
+}
+.horario-dia {
+  display: grid;
+  grid-template-columns: 9rem minmax(10rem, 13rem) auto;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+.horario-horas {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.horario-horas input {
+  width: 7rem;
+}
+.externa {
+  display: grid;
+  gap: 0.35rem;
+  max-width: 42rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px dashed var(--linha-forte);
+  border-radius: var(--raio);
+  font-size: 0.92rem;
+}
+.externa-fim {
+  color: var(--tinta-suave);
+}
+.soltar {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 1.25rem 1rem;
+  border: 2px dashed var(--linha-forte);
+  border-radius: var(--raio);
+  background: var(--papel);
+  text-align: center;
+}
+.soltar-ativo {
+  border-color: var(--cafezal);
+  background: #eef5f1;
+}
+.soltar:focus-within {
+  outline: 2px solid var(--cafezal);
+  outline-offset: 2px;
+}
+.grupo-aviso {
+  max-width: 28ch;
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+}
+.grupo-linha-larga > .acoes {
+  grid-column: 2 / -1;
+}
+.grupo-linha-larga {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
 /* ---------- Telas estreitas ---------- */
 
 @media (max-width: 1040px) {
@@ -1508,6 +1681,17 @@ label {
   }
   .grupo-linha > .acoes {
     grid-column: 2;
+  }
+  .horario-dia {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.3rem;
+  }
+  .cidades-linha {
+    flex-wrap: wrap;
+  }
+  .cidades-linha input {
+    flex: 1;
+    min-width: 10rem;
   }
   .filtro {
     grid-template-columns: minmax(0, 1fr);

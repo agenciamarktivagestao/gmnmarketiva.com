@@ -32,6 +32,22 @@ export type Comentario = { id: string; pendencia_id: string; autor: string; text
 // Tipo de resposta que a pendência pede. Sem `kind` (pendências antigas), vale "approve".
 export type Kind = "approve" | "choose" | "input" | "upload" | "external";
 
+export type OpcaoEscolha = { valor: string; rotulo: string; detalhe?: string };
+export type DiaSemana = "seg" | "ter" | "qua" | "qui" | "sex" | "sab" | "dom";
+
+// O que cada tipo de pendência guarda em `payload` (tudo opcional: o painel tem um padrão para cada campo)
+export type PayloadApprove = { rotulo?: string };
+export type PayloadChoose = { pergunta?: string; opcoes?: OpcaoEscolha[]; permitir_outro?: boolean };
+export type PayloadInput = {
+  campo?: "cidades" | "horario" | "checklist" | "texto";
+  pergunta?: string;
+  rotulo?: string;
+  opcoes?: string[];
+  dias?: DiaSemana[];
+};
+export type PayloadUpload = { categoria?: "COVER" | "ADDITIONAL"; varias?: boolean; sugestao?: string };
+export type PayloadExternal = { onde?: "chrome" | "plano_pago" | "chrome_ou_plano" | "windsor"; como?: string };
+
 export type Pendencia = {
   id: string;
   cliente_id: string | null;
@@ -43,7 +59,8 @@ export type Pendencia = {
   origem: string;
   kind?: Kind | null;
   payload?: Record<string, unknown> | null;
-  resposta?: Record<string, unknown> | null;
+  // Gravado pelo painel quando a equipe responde (resumo é o texto que a rotina também recebe como comentário)
+  resposta?: { tipo?: string; valor?: unknown; resumo?: string; em?: string } | null;
   decidido_por: string | null;
   decidido_em: string | null;
   criado_em: string;

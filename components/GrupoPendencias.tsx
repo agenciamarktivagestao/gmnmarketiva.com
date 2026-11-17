@@ -10,6 +10,7 @@ import type { Pendencia, Prioridade, Status } from "@/lib/tipos";
 type ClienteResumo = { slug: string; nome: string };
 
 const PESO: Record<Prioridade, number> = { alta: 0, media: 1, baixa: 2 };
+const larga = (p: Pendencia) => p.status === "aberta" && (p.kind === "choose" || p.kind === "input" || p.kind === "upload");
 
 // Um card para várias pendências iguais. A decisão em grupo grava uma decisão por pendência.
 export function GrupoPendencias({
@@ -31,6 +32,10 @@ export function GrupoPendencias({
 
   const status: Status = itens[0].status;
   const quem = itens[0].quem;
+  const kind = itens[0].kind ?? "approve";
+  // O botão principal usa o rótulo próprio da pendência quando todos os perfis têm o mesmo
+  const rotulosPayload = new Set(itens.map((p) => (p.payload as { rotulo?: string } | null)?.rotulo));
+  const rotuloComum = rotulosPayload.size === 1 ? [...rotulosPayload][0] : undefined;
   const prioridade = itens.map((p) => p.prioridade).sort((a, b) => PESO[a] - PESO[b])[0];
   const nomeDe = (p: Pendencia) => (p.cliente_id ? clientes[p.cliente_id]?.nome : undefined) ?? "Todos os perfis";
   const nomes = itens.map(nomeDe);
@@ -41,7 +46,11 @@ export function GrupoPendencias({
   // "Aprovar todos (4)" quando tudo está marcado; "Aprovar 3 marcados" quando não
   const n = escolhidos.length;
   const rotulos = {
-    aprovar: todos ? `Aprovar todos (${itens.length})` : `Aprovar ${n} ${n === 1 ? "marcado" : "marcados"}`,
+    aprovar: rotuloComum
+      ? `${rotuloComum}: ${todos ? `todos (${itens.length})` : `${n} ${n === 1 ? "marcado" : "marcados"}`}`
+      : todos
+        ? `Aprovar todos (${itens.length})`
+        : `Aprovar ${n} ${n === 1 ? "marcado" : "marcados"}`,
     recusar: todos ? `Recusar todos (${itens.length})` : `Recusar ${n} ${n === 1 ? "marcado" : "marcados"}`,
     feito: todos ? `Marcar todos como feito (${itens.length})` : `Marcar ${n} como ${n === 1 ? "feito" : "feitos"}`,
     reabrir: todos ? `Reabrir todos (${itens.length})` : `Reabrir ${n} ${n === 1 ? "marcado" : "marcados"}`,
@@ -88,40 +97,54 @@ export function GrupoPendencias({
         )}
         <div>
           <button type="button" className="btn btn-discreto grupo-abrir" aria-expanded={aberto} aria-controls={idLista} onClick={() => setAberto(!aberto)}>
-            {aberto ? "Esconder os perfis" : `Ver os ${itens.length} perfis`}
+            {aberto ? "Esconder os perfis" : `${status === "aberta" && (kind === "choose" || kind === "input" || kind === "upload") ? "Responder" : "Ver"} os ${itens.length} perfis`}
           </button>
         </div>
       </div>
 
       <div className="acoes" aria-busy={pendente}>
         {podeEditar && (
-          <div className="acoes-botoes">
-            {status === "aberta" && (
-              <>
+          <>
+            {status === "aberta" && kind === "approve" && (
+              <div>
                 <button type="button" className="btn btn-primario" disabled={pendente || semMarca} onClick={() => decidir("aprovada", "aprovadas.")}>
                   {rotulos.aprovar}
                 </button>
-                <button type="button" className="btn" disabled={pendente || semMarca} onClick={() => decidir("recusada", "recusadas.")}>
+              </div>
+            )}
+            {status === "aberta" && kind === "external" && (
+              <div>
+                <button type="button" className="btn" disabled={pendente || semMarca} onClick={() => decidir("concluida", "marcadas como feitas.")}>
+                  {rotulos.feito}
+                </button>
+              </div>
+            )}
+            {status === "aberta" && (kind === "choose" || kind === "input" || kind === "upload") && (
+              <p className="grupo-aviso">Cada perfil tem a sua resposta. Abra a lista para responder um a um.</p>
+            )}
+            <div className="acoes-sec">
+              {status === "aberta" && (
+                <button type="button" className="btn btn-discreto" disabled={pendente || semMarca} onClick={() => decidir("recusada", "recusadas.")}>
                   {rotulos.recusar}
                 </button>
-              </>
-            )}
-            {(status === "aberta" || status === "aprovada") && (
-              <button type="button" className="btn" disabled={pendente || semMarca} onClick={() => decidir("concluida", "marcadas como feitas.")}>
-                {rotulos.feito}
-              </button>
-            )}
-            {status !== "aberta" && status !== "aprovada" && (
-              <button type="button" className="btn btn-discreto" disabled={pendente || semMarca} onClick={() => decidir("aberta", "reabertas.")}>
-                {rotulos.reabrir}
-              </button>
-            )}
-            {status === "aprovada" && (
-              <button type="button" className="btn btn-discreto" disabled={pendente || semMarca} onClick={() => decidir("aberta", "reabertas.")}>
-                {rotulos.reabrir}
-              </button>
-            )}
-          </div>
+              )}
+              {status === "aberta" && kind !== "external" && (
+                <button type="button" className="btn btn-discreto" disabled={pendente || semMarca} onClick={() => decidir("concluida", "marcadas como feitas.")}>
+                  {rotulos.feito}
+                </button>
+              )}
+              {status === "aprovada" && (
+                <button type="button" className="btn btn-discreto" disabled={pendente || semMarca} onClick={() => decidir("concluida", "marcadas como feitas.")}>
+                  {rotulos.feito}
+                </button>
+              )}
+              {status !== "aberta" && (
+                <button type="button" className="btn btn-discreto" disabled={pendente || semMarca} onClick={() => decidir("aberta", "reabertas.")}>
+                  {rotulos.reabrir}
+                </button>
+              )}
+            </div>
+          </>
         )}
         {aviso && (
           <p role={aviso.erro ? "alert" : "status"} className={aviso.erro ? "erro" : "sucesso"}>
@@ -149,7 +172,7 @@ export function GrupoPendencias({
             {itens.map((p) => {
               const cli = p.cliente_id ? clientes[p.cliente_id] : undefined;
               return (
-                <li key={p.id} className="grupo-linha">
+                <li key={p.id} className={larga(p) ? "grupo-linha grupo-linha-larga" : "grupo-linha"}>
                   {podeEditar && (
                     <label className="grupo-marca">
                       <input type="checkbox" checked={marcados.has(p.id)} onChange={() => alternar(p.id)} />
@@ -161,7 +184,7 @@ export function GrupoPendencias({
                     {p.detalhe && <p className="pend-detalhe">{p.detalhe}</p>}
                     {p.prioridade !== prioridade && <p className="grupo-prio">Prioridade {PRIORIDADE[p.prioridade].toLowerCase()}</p>}
                   </div>
-                  <AcoesPendencia id={p.id} status={p.status} comentarios={p.comentarios} podeEditar={podeEditar} />
+                  <AcoesPendencia p={p} podeEditar={podeEditar} />
                 </li>
               );
             })}

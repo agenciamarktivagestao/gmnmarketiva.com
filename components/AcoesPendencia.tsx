@@ -2,20 +2,15 @@
 
 import { useState, useTransition } from "react";
 import { comentar, decidir } from "@/app/actions";
+import { Decisao } from "./Decisao";
 import { dataCurta, hora } from "@/lib/rotulos";
-import type { Comentario, Status } from "@/lib/tipos";
+import type { Pendencia, Status } from "@/lib/tipos";
 
-export function AcoesPendencia({
-  id,
-  status,
-  comentarios,
-  podeEditar,
-}: {
-  id: string;
-  status: Status;
-  comentarios: Comentario[];
-  podeEditar: boolean;
-}) {
+// Parte principal (conforme o tipo da pendência) e, abaixo, as ações secundárias: Recusar,
+// Marcar como feito e Comentar. As decisões continuam gravadas como sempre: status e comentário.
+export function AcoesPendencia({ p, podeEditar }: { p: Pendencia; podeEditar: boolean }) {
+  const { id, status, comentarios } = p;
+  const kind = p.kind ?? "approve";
   const [pendente, iniciar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
   const [aberto, setAberto] = useState(false);
@@ -38,33 +33,29 @@ export function AcoesPendencia({
 
   return (
     <div className="acoes" aria-busy={pendente}>
-      {podeEditar && (
-        <div className="acoes-botoes">
-          {status === "aberta" && (
-            <>
-              <button type="button" className="btn btn-primario" disabled={pendente} onClick={() => mudar("aprovada")}>
-                Aprovar
-              </button>
-              <button type="button" className="btn" disabled={pendente} onClick={() => mudar("recusada")}>
-                Recusar
-              </button>
-            </>
-          )}
-          {(status === "aberta" || status === "aprovada") && (
-            <button type="button" className="btn" disabled={pendente} onClick={() => mudar("concluida")}>
-              Marcar como feito
-            </button>
-          )}
-          {(status === "aprovada" || status === "recusada" || status === "concluida") && (
-            <button type="button" className="btn btn-discreto" disabled={pendente} onClick={() => mudar("aberta")}>
-              Reabrir
-            </button>
-          )}
-        </div>
-      )}
-      <button type="button" className="btn btn-discreto" aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
-        {comentarios.length > 0 ? `Comentários (${comentarios.length})` : "Comentar"}
-      </button>
+      <Decisao p={p} podeEditar={podeEditar} mudar={mudar} pendente={pendente} />
+
+      <div className="acoes-sec">
+        {podeEditar && status === "aberta" && (
+          <button type="button" className="btn btn-discreto" disabled={pendente} onClick={() => mudar("recusada")}>
+            Recusar
+          </button>
+        )}
+        {podeEditar && (status === "aberta" || status === "aprovada") && (
+          // Em pendências que só se resolvem fora do painel, "Marcar como feito" é o caminho principal
+          <button type="button" className={kind === "external" && status === "aberta" ? "btn" : "btn btn-discreto"} disabled={pendente} onClick={() => mudar("concluida")}>
+            Marcar como feito
+          </button>
+        )}
+        {podeEditar && (status === "aprovada" || status === "recusada" || status === "concluida") && (
+          <button type="button" className="btn btn-discreto" disabled={pendente} onClick={() => mudar("aberta")}>
+            Reabrir
+          </button>
+        )}
+        <button type="button" className="btn btn-discreto" aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
+          {comentarios.length > 0 ? `Comentários (${comentarios.length})` : "Comentar"}
+        </button>
+      </div>
 
       {aberto && (
         <div className="comentarios">

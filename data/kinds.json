@@ -1,0 +1,455 @@
+[
+ {
+  "titulo": "Endereço em conflito",
+  "cliente": "clinica-central-norte",
+  "kind": "choose",
+  "payload": {
+   "pergunta": "Qual é o endereço correto?",
+   "opcoes": [
+    {
+     "valor": "saul-elkind",
+     "rotulo": "Av. Saul Elkind, 1433",
+     "detalhe": "É o que o perfil mostra hoje"
+    },
+    {
+     "valor": "lago-vitoria",
+     "rotulo": "Rua Lago Vitória, 696",
+     "detalhe": "Estava na descrição antiga"
+    }
+   ],
+   "permitir_outro": true
+  }
+ },
+ {
+  "titulo": "Perfil duplicado",
+  "cliente": "clinica-central-norte",
+  "kind": "choose",
+  "payload": {
+   "pergunta": "O que fazer com o perfil duplicado?",
+   "opcoes": [
+    {
+     "valor": "remover",
+     "rotulo": "Pedir a remoção do perfil duplicado"
+    },
+    {
+     "valor": "assumir",
+     "rotulo": "Assumir o acesso ao perfil duplicado"
+    }
+   ],
+   "permitir_outro": false
+  }
+ },
+ {
+  "titulo": "Nome e endereço não batem",
+  "cliente": "bilumix",
+  "kind": "choose",
+  "payload": {
+   "pergunta": "Onde fica a usina?",
+   "opcoes": [
+    {
+     "valor": "cambe",
+     "rotulo": "Em Cambé",
+     "detalhe": "O nome do perfil diz Cambé"
+    },
+    {
+     "valor": "londrina",
+     "rotulo": "Em Londrina",
+     "detalhe": "O endereço é na Estância Dlaville"
+    }
+   ],
+   "permitir_outro": true
+  }
+ },
+ {
+  "titulo": "Categorias de estúdio",
+  "cliente": "marktiva",
+  "kind": "choose",
+  "payload": {
+   "pergunta": "Existe estúdio na Marktiva?",
+   "opcoes": [
+    {
+     "valor": "existe",
+     "rotulo": "Existe estúdio: manter as categorias"
+    },
+    {
+     "valor": "nao-existe",
+     "rotulo": "Não existe: trocar por categorias de marketing"
+    }
+   ],
+   "permitir_outro": false
+  }
+ },
+ {
+  "titulo": "Área de atendimento vazia",
+  "cliente": "bilumix",
+  "quem": "voce",
+  "kind": "input",
+  "payload": {
+   "campo": "cidades",
+   "pergunta": "Em quais cidades a Bilumix entrega?"
+  }
+ },
+ {
+  "titulo": "Atributos quase vazios",
+  "cliente": "otica-sergipe",
+  "kind": "input",
+  "payload": {
+   "campo": "checklist",
+   "pergunta": "O que a unidade oferece? Marque o que vale.",
+   "opcoes": [
+    "Pagamento",
+    "Estacionamento",
+    "Acessibilidade"
+   ]
+  }
+ },
+ {
+  "titulo": "Atributos quase vazios",
+  "cliente": "bilumix",
+  "kind": "input",
+  "payload": {
+   "campo": "checklist",
+   "pergunta": "O que a Bilumix oferece? Marque o que vale.",
+   "opcoes": [
+    "Pagamento",
+    "Entrega",
+    "Estacionamento"
+   ]
+  }
+ },
+ {
+  "titulo": "Atributos vazios",
+  "cliente": "dra-ana-luiza",
+  "kind": "input",
+  "payload": {
+   "campo": "checklist",
+   "pergunta": "O que o consultório oferece? Marque o que vale.",
+   "opcoes": [
+    "Pagamento",
+    "Acessibilidade",
+    "Agendamento online",
+    "WhatsApp"
+   ]
+  }
+ },
+ {
+  "titulo": "Atributos vazios",
+  "cliente": "garagem-3",
+  "kind": "input",
+  "payload": {
+   "campo": "checklist",
+   "pergunta": "O que a loja oferece? Marque o que vale.",
+   "opcoes": [
+    "Pagamento",
+    "Estacionamento",
+    "Acessibilidade",
+    "Link de WhatsApp"
+   ]
+  }
+ },
+ {
+  "titulo": "Atributos incompletos",
+  "cliente": "aline-ceccotti",
+  "kind": "input",
+  "payload": {
+   "campo": "checklist",
+   "pergunta": "O que o espaço oferece? Marque o que vale.",
+   "opcoes": [
+    "Atendimento com hora marcada",
+    "Estacionamento",
+    "Acessibilidade"
+   ]
+  }
+ },
+ {
+  "titulo": "Poucos serviços",
+  "cliente": "garagem-3",
+  "kind": "input",
+  "payload": {
+   "campo": "checklist",
+   "pergunta": "Quais serviços a loja oferece?",
+   "opcoes": [
+    "Compra",
+    "Troca",
+    "Financiamento"
+   ]
+  }
+ },
+ {
+  "titulo": "Endereço escrito errado",
+  "cliente": "brava-motors",
+  "kind": "input",
+  "payload": {
+   "campo": "texto",
+   "pergunta": "Qual é o endereço certo?",
+   "rotulo": "Rua ou avenida, número e bairro"
+  }
+ },
+ {
+  "titulo": "Capa vertical",
+  "cliente": "otica-av-rio-de-janeiro",
+  "kind": "upload",
+  "payload": {
+   "categoria": "COVER",
+   "sugestao": "Foto horizontal da fachada"
+  }
+ },
+ {
+  "titulo": "Capa vertical",
+  "cliente": "otica-saul-elkind",
+  "kind": "upload",
+  "payload": {
+   "categoria": "COVER",
+   "sugestao": "Foto horizontal da fachada"
+  }
+ },
+ {
+  "titulo": "Capa vertical",
+  "cliente": "aline-ceccotti",
+  "kind": "upload",
+  "payload": {
+   "categoria": "COVER",
+   "sugestao": "Foto horizontal do espaço"
+  }
+ },
+ {
+  "titulo": "Capa vertical",
+  "cliente": "bilumix",
+  "kind": "upload",
+  "payload": {
+   "categoria": "COVER",
+   "sugestao": "Foto horizontal da usina ou dos caminhões"
+  }
+ },
+ {
+  "titulo": "Capa quadrada",
+  "cliente": "garagem-3",
+  "kind": "upload",
+  "payload": {
+   "categoria": "COVER",
+   "sugestao": "Foto horizontal da fachada ou do pátio"
+  }
+ },
+ {
+  "titulo": "Sem fotos e sem capa",
+  "cliente": "otica-sergipe",
+  "kind": "upload",
+  "payload": {
+   "categoria": "ADDITIONAL",
+   "sugestao": "Fotos da loja, com uma horizontal da fachada para a capa",
+   "varias": true
+  }
+ },
+ {
+  "titulo": "Sem fotos e sem capa",
+  "cliente": "dra-ana-luiza",
+  "kind": "upload",
+  "payload": {
+   "categoria": "ADDITIONAL",
+   "sugestao": "Fotos do consultório e da Dra., com uma horizontal para a capa",
+   "varias": true
+  }
+ },
+ {
+  "titulo": "Sem pasta no Drive",
+  "cliente": "brava-motors",
+  "kind": "upload",
+  "payload": {
+   "categoria": "ADDITIONAL",
+   "sugestao": "Fotos para a rotina usar nas próximas semanas",
+   "varias": true
+  }
+ },
+ {
+  "titulo": "Aberto 24 horas, todos os dias",
+  "cliente": "marktiva",
+  "kind": "input",
+  "payload": {
+   "campo": "horario",
+   "pergunta": "Qual é o horário real de funcionamento?"
+  }
+ },
+ {
+  "titulo": "Descrição com dados da rede",
+  "cliente": "otica-sergipe",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Pode usar \"desde 1979\" nesta unidade"
+  }
+ },
+ {
+  "titulo": "Confirmar joias, relógios e presentes",
+  "cliente": "otica-souza-naves",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Sim, a unidade vende"
+  }
+ },
+ {
+  "titulo": "Confirmar \"lentes de contato dental\"",
+  "cliente": "dra-ana-luiza",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Sim, a Dra. faz"
+  }
+ },
+ {
+  "titulo": "Categoria principal fraca",
+  "cliente": "zero-a-sete",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Trocar para película/insulfilm"
+  }
+ },
+ {
+  "titulo": "Categoria principal: escritório",
+  "cliente": "marktiva",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Trocar para agência de marketing"
+  }
+ },
+ {
+  "titulo": "Área de atendimento vazia",
+  "cliente": "aline-ceccotti",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Listar Cambé e Londrina"
+  }
+ },
+ {
+  "titulo": "Sem horário de sábado",
+  "kind": "input",
+  "payload": {
+   "campo": "horario",
+   "pergunta": "A unidade abre aos sábados?",
+   "dias": [
+    "sab"
+   ]
+  }
+ },
+ {
+  "titulo": "Confirmar a capa",
+  "kind": "choose",
+  "payload": {
+   "pergunta": "A capa atual é horizontal?",
+   "opcoes": [
+    {
+     "valor": "horizontal",
+     "rotulo": "Sim, a capa já é horizontal"
+    },
+    {
+     "valor": "enviar",
+     "rotulo": "Não, vou enviar uma foto horizontal"
+    }
+   ],
+   "permitir_outro": false
+  }
+ },
+ {
+  "titulo": "Nome com palavras-chave e cidade",
+  "kind": "external",
+  "payload": {
+   "onde": "chrome"
+  }
+ },
+ {
+  "titulo": "17 avaliações não lidas",
+  "kind": "external",
+  "payload": {
+   "onde": "chrome_ou_plano"
+  }
+ },
+ {
+  "titulo": "799 avaliações, só o último mês visível",
+  "kind": "external",
+  "payload": {
+   "onde": "chrome_ou_plano"
+  }
+ },
+ {
+  "titulo": "Aba Produtos fora do alcance",
+  "kind": "external",
+  "payload": {
+   "onde": "chrome"
+  }
+ },
+ {
+  "titulo": "Demais empresas não aparecem no Windsor",
+  "kind": "external",
+  "payload": {
+   "onde": "windsor"
+  }
+ },
+ {
+  "titulo": "Nenhuma postagem em 30 dias",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Publicar uma postagem por perfil"
+  }
+ },
+ {
+  "titulo": "Sem categorias adicionais",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Incluir as categorias sugeridas"
+  }
+ },
+ {
+  "titulo": "Poucas fotos novas",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Conferir o Drive e subir as fotos"
+  }
+ },
+ {
+  "titulo": "8 fotos no Drive sem subir",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Subir as fotos"
+  }
+ },
+ {
+  "titulo": "Serviços sem descrição",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Escrever as descrições"
+  }
+ },
+ {
+  "titulo": "Área de atendimento vazia",
+  "quem": "eu",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Listar as cidades"
+  }
+ },
+ {
+  "titulo": "Resposta pronta e não publicada",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Publicar resposta"
+  }
+ },
+ {
+  "titulo": "Avaliação sem resposta",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Publicar resposta"
+  }
+ },
+ {
+  "titulo": "2 avaliações retidas",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Responder as avaliações"
+  }
+ },
+ {
+  "titulo": "3 avaliações de 1 estrela sem resposta",
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Responder as avaliações"
+  }
+ }
+]
