@@ -8,7 +8,7 @@ Painel da Agência Marktiva para gerir os perfis do Google Meu Negócio dos clie
 - **Histórico**: tudo o que a rotina e a equipe fizeram, por dia.
 - **Equipe**: quais e-mails podem entrar.
 
-Feito com Next.js 16 (App Router), Supabase (banco e login) e Vercel (publicação).
+Feito com Next.js 16 (App Router), Supabase (banco e login) e Vercel (publicação). No ar em https://gmnmarketiva.vercel.app.
 
 ## Como o sistema se encaixa na rotina
 
