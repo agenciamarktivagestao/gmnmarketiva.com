@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Fase } from "./Fase";
 import { camposDaPendencia, temProblema } from "@/lib/campos";
 import { CAMPOS, NIVEL, estaAberta } from "@/lib/rotulos";
+import { secaoDoCampo } from "@/lib/secoes";
 import type { Cliente, Diagnostico, Pendencia } from "@/lib/tipos";
 
 export function Matriz({
@@ -52,7 +53,7 @@ export function Matriz({
   return (
     <div className="matriz-rolagem">
       <table className={soProblema ? "matriz matriz-foco" : "matriz"}>
-        <caption className="sr-only">Situação de cada campo do perfil por cliente. Cada bolinha leva às pendências daquele campo.</caption>
+        <caption className="sr-only">Situação de cada campo do perfil por cliente. Cada bolinha leva à parte do perfil do cliente onde o campo e as pendências estão.</caption>
         <thead>
           <tr>
             <th scope="col" className="matriz-cliente">
@@ -94,12 +95,8 @@ export function Matriz({
                   );
                 }
                 const lista = porCampo.get(c.chave) ?? [];
-                // Com pendência aberta, vai direto a ela; sem pendência mas fora de ordem, vai à página do cliente
-                const destino = lista.length
-                  ? `/pendencias?quem=todas&cliente=${cli.slug}&campo=${c.chave}`
-                  : campo.nivel !== "ok"
-                    ? `/clientes/${cli.slug}`
-                    : null;
+                // Fora de ordem ou com pendência: leva à parte do perfil na página do cliente, onde a pendência está logo abaixo
+                const destino = lista.length || campo.nivel !== "ok" ? `/clientes/${cli.slug}#parte-${secaoDoCampo(c.chave) ?? "outras"}` : null;
                 const descricao = `${cli.nome}, ${c.nome}: ${NIVEL[campo.nivel]}. ${campo.valor}.${
                   lista.length ? ` ${lista.length} ${lista.length === 1 ? "pendência aberta" : "pendências abertas"}.` : ""
                 }`;
@@ -124,7 +121,7 @@ export function Matriz({
                 );
               })}
               <td className="matriz-pend">
-                <Link href={`/pendencias?quem=todas&cliente=${cli.slug}`}>{total}</Link>
+                <Link href={`/clientes/${cli.slug}`}>{total}</Link>
                 {altas > 0 && (
                   <span className="matriz-altas">
                     {altas} {altas === 1 ? "alta" : "altas"}

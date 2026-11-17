@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ItemPendencia } from "@/components/ItemPendencia";
 import { Matriz } from "@/components/Matriz";
 import { Fase } from "@/components/Fase";
 import {
@@ -10,16 +9,18 @@ import {
   listarMidias,
   listarPendencias,
   listarServicos,
-  usuarioAtual,
 } from "@/lib/dados";
-import { dataCurta, ordenarPendencias } from "@/lib/rotulos";
+import { camposDaPendencia } from "@/lib/campos";
+import { PRIORIDADE, dataCurta, estaAberta, ordenarPendencias } from "@/lib/rotulos";
+import { SECOES, secaoDe } from "@/lib/secoes";
+
+const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
 
 export default async function Painel({ searchParams }: { searchParams: Promise<{ ordem?: string; problema?: string }> }) {
   const busca = await searchParams;
   const ordenarPorAbertas = busca.ordem === "abertas";
   const soProblema = busca.problema === "1";
-  const [usuario, clientes, diagnosticos, pendencias, conteudos, midias, servicos, diretrizes] = await Promise.all([
-    usuarioAtual(),
+  const [clientes, diagnosticos, pendencias, conteudos, midias, servicos, diretrizes] = await Promise.all([
     listarClientes(),
     listarDiagnosticos(),
     listarPendencias(),
@@ -66,12 +67,21 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
     const s = q.toString();
     return s ? `/?${s}` : "/";
   };
-  const podeEditar = usuario?.papel === "admin" || usuario?.papel === "editor";
-  const abertas = pendencias.filter((p) => p.status === "aberta" || p.status === "aprovada");
+  const abertas = pendencias.filter(estaAberta);
   const esperam = pendencias.filter((p) => p.quem === "voce" && p.status === "aberta");
-  const altas = abertas.filter((p) => p.prioridade === "alta").length;
-  const fila = ordenarPendencias(esperam).slice(0, 5);
+  const altasEsperam = esperam.filter((p) => p.prioridade === "alta").length;
+  // O resto das abertas não precisa de você agora
+  const aprovadas = abertas.filter((p) => p.status === "aprovada").length;
+  const rotinaFaz = abertas.filter((p) => p.status === "aberta" && p.quem === "eu").length;
+  const bloqueadas = abertas.filter((p) => p.status === "aberta" && p.quem === "bloq").length;
+  const outras = [
+    aprovadas > 0 && `${plural(aprovadas, "já aprovada aguarda", "já aprovadas aguardam")} a rotina`,
+    rotinaFaz > 0 && `${plural(rotinaFaz, "a rotina faz sozinha", "a rotina faz sozinhas")}`,
+    bloqueadas > 0 && `${plural(bloqueadas, "depende", "dependem")} de Chrome ou de plano pago`,
+  ].filter((t): t is string => !!t);
+  const fila = ordenarPendencias(esperam).slice(0, 6);
   const porId = new Map(clientes.map((c) => [c.id, c]));
+  const nomeDaParte = new Map<string, string>(SECOES.map((x) => [x.chave, x.nome]));
   const leitura = [...diagnosticos.values()].map((d) => d.lido_em).sort().at(-1);
 
   return (
@@ -80,12 +90,26 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
         <h1>
           {esperam.length === 0
             ? "Nada espera a sua decisão"
-            : `${esperam.length} ${esperam.length === 1 ? "pendência espera" : "pendências esperam"} a sua decisão`}
+            : `${plural(esperam.length, "decisão espera", "decisões esperam")} por você`}
         </h1>
         <p className="lead">
-          Há {abertas.length} pendências abertas em {clientes.length} perfis, {altas} com prioridade alta.
-          {leitura && ` Última leitura dos perfis em ${dataCurta(`${leitura}T12:00:00Z`)}, com dados dos últimos 30 dias.`}
+          {esperam.length > 0 && altasEsperam > 0 && `Destas, ${plural(altasEsperam, "é de prioridade alta", "são de prioridade alta")}. `}
+          {outras.length > 0
+            ? `Outras ${abertas.length - esperam.length} não precisam de você agora: ${outras.join("; ")}.`
+            : esperam.length === 0
+              ? "A rotina segue com o que já foi aprovado."
+              : ""}
         </p>
+        {esperam.length > 0 && (
+          <p className="abertura-acoes">
+            <Link className="btn btn-primario" href="/pendencias/triagem?quem=voce">
+              Decidir uma por vez
+            </Link>
+            <Link className="link-secao" href="/pendencias?quem=voce">
+              Ver a lista das {esperam.length}
+            </Link>
+          </p>
+        )}
       </section>
 
       {resumoVisivel.length > 0 && (
@@ -131,6 +155,10 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
               </li>
             </ul>
           </div>
+          <p className="dica-secao">
+            Clique numa bolinha para abrir essa parte do perfil do cliente.
+            {leitura && ` Leitura de ${dataCurta(`${leitura}T12:00:00Z`)}, com dados dos últimos 30 dias.`}
+          </p>
           <Matriz
             clientes={clientes}
             diagnosticos={diagnosticos}
@@ -141,23 +169,42 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
           />
         </section>
 
-        <aside aria-labelledby="t-fila" className="fila">
-          <div className="secao-topo">
-            <h2 id="t-fila">Esperam você</h2>
-            <Link href="/pendencias?quem=voce" className="link-secao">
-              Ver as {esperam.length}
-            </Link>
-          </div>
-          {fila.length === 0 ? (
-            <p className="vazio">Nenhuma decisão pendente. A rotina segue com o que já foi aprovado.</p>
-          ) : (
-            <ul className="lista-pend">
-              {fila.map((p) => (
-                <ItemPendencia key={p.id} p={p} cliente={p.cliente_id ? porId.get(p.cliente_id) : undefined} podeEditar={podeEditar} />
-              ))}
+        {fila.length > 0 && (
+          <aside aria-labelledby="t-fila" className="fila">
+            <div className="secao-topo">
+              <h2 id="t-fila">Primeiras da fila</h2>
+            </div>
+            <ul className="fila-lista">
+              {fila.map((p) => {
+                const cliente = p.cliente_id ? porId.get(p.cliente_id) : undefined;
+                const parte = secaoDe(p, camposDaPendencia(p));
+                // Com cliente, abre a parte do perfil onde a pendência está; sem cliente, a lista das gerais
+                const destino = cliente ? `/clientes/${cliente.slug}#parte-${parte}` : "/pendencias?quem=voce&cliente=todos";
+                return (
+                  <li key={p.id} className={`fila-item pend-${p.prioridade}`}>
+                    <Link href={destino}>
+                      <span className="fila-onde">
+                        <span>{cliente ? cliente.nome : "Todos os perfis"}</span>
+                        {cliente && <span className="fila-parte">{nomeDaParte.get(parte) ?? "Outras"}</span>}
+                      </span>
+                      <span className="fila-titulo">
+                        {p.titulo}
+                        <span className="sr-only">. Prioridade {PRIORIDADE[p.prioridade].toLowerCase()}.</span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
-          )}
-        </aside>
+            {esperam.length > fila.length && (
+              <p className="fila-resto">
+                <Link href="/pendencias?quem=voce" className="link-secao">
+                  Mais {esperam.length - fila.length} na lista
+                </Link>
+              </p>
+            )}
+          </aside>
+        )}
       </div>
     </>
   );

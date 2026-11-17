@@ -77,6 +77,16 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
     return s ? `/pendencias?${s}` : "/pendencias";
   };
 
+  // O que está diferente do padrão da página, para aparecer ao lado do botão "Filtros" e poder ser tirado com um clique
+  const ativos: { chave: keyof Busca; nome: string }[] = [];
+  if (campo) ativos.push({ chave: "campo", nome: `Campo: ${campo.nome}` });
+  if (cliente) ativos.push({ chave: "cliente", nome: `Cliente: ${cliente.nome}` });
+  if (busca.cliente === "todos") ativos.push({ chave: "cliente", nome: "Só pendências gerais" });
+  if (busca.prioridade) ativos.push({ chave: "prioridade", nome: `Prioridade ${PRIO_OPC.find(([v]) => v === busca.prioridade)?.[1].toLowerCase() ?? busca.prioridade}` });
+  if (status !== "abertas") ativos.push({ chave: "status", nome: STATUS_OPC.find(([v]) => v === status)?.[1] ?? status });
+  if (!agruparIguais) ativos.push({ chave: "agrupar", nome: "Mostrando separadas" });
+  const semFiltros = href({ campo: "", cliente: "", prioridade: "", status: "", agrupar: "" });
+
   const grupo = (titulo: string, chave: keyof Busca, opcoes: string[][], atual: string) => (
     <div className="filtro">
       <p className="filtro-nome" id={`f-${chave}`}>
@@ -98,17 +108,14 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
     <>
       <section className="abertura">
         <h1>Pendências</h1>
-        <p className="lead">
-          Aprove o que a rotina da madrugada pode executar, recuse o que não deve ser feito e deixe comentários com o que mudou.
-          A rotina lê as decisões na próxima rodada.
-        </p>
+        <p className="lead">Decida o que a rotina pode fazer. Ela lê as decisões na próxima rodada.</p>
       </section>
 
       <p className="abertura-acoes">
         <Link className="btn btn-primario" href={quem === "todas" ? "/pendencias/triagem" : `/pendencias/triagem?quem=${quem}`}>
           Decidir uma por vez
         </Link>
-        <span className="contagem">Teclado: A aprova, R recusa, C comenta, S pula, Z desfaz.</span>
+        <span className="contagem dica-teclado">Teclado: A aprova, R recusa, C comenta, S pula, Z desfaz.</span>
       </p>
 
       {podeEditar && <FormNovaPendencia clientes={clientes} />}
@@ -121,64 +128,74 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
         ))}
       </nav>
 
-      <div className="filtros">
-        {campo && (
-          <div className="filtro">
-            <p className="filtro-nome" id="f-campo">
-              Campo do perfil
-            </p>
-            <ul aria-labelledby="f-campo">
-              <li>
-                <Link href={href({ campo: "" })} className="chip" aria-current="true">
-                  {campo.nome} ×<span className="sr-only">, tirar este filtro</span>
-                </Link>
-              </li>
-            </ul>
+      <div className="filtros-barra">
+        <details className="filtros-caixa">
+          <summary>
+            Filtros
+            {ativos.length > 0 && <span className="filtros-n">{ativos.length}</span>}
+          </summary>
+          <div className="filtros">
+            <div className="filtro">
+              <p className="filtro-nome" id="f-agrupar">
+                Pendências iguais
+              </p>
+              <ul aria-labelledby="f-agrupar">
+                <li>
+                  <Link href={href({ agrupar: "" })} className="chip" aria-current={agruparIguais ? "true" : undefined}>
+                    Agrupar
+                  </Link>
+                </li>
+                <li>
+                  <Link href={href({ agrupar: "0" })} className="chip" aria-current={!agruparIguais ? "true" : undefined}>
+                    Mostrar separadas
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            {grupo("Prioridade", "prioridade", PRIO_OPC, busca.prioridade ?? "")}
+            {grupo("Situação", "status", STATUS_OPC, status)}
+            <div className="filtro">
+              <p className="filtro-nome" id="f-cliente">
+                Cliente
+              </p>
+              <ul aria-labelledby="f-cliente">
+                <li>
+                  <Link href={href({ cliente: "" })} className="chip" aria-current={!busca.cliente ? "true" : undefined}>
+                    Todos
+                  </Link>
+                </li>
+                <li>
+                  <Link href={href({ cliente: "todos" })} className="chip" aria-current={busca.cliente === "todos" ? "true" : undefined}>
+                    Gerais
+                  </Link>
+                </li>
+                {clientes.map((c) => (
+                  <li key={c.id}>
+                    <Link href={href({ cliente: c.slug })} className="chip" aria-current={busca.cliente === c.slug ? "true" : undefined}>
+                      {c.nome}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        )}
-        <div className="filtro">
-          <p className="filtro-nome" id="f-agrupar">
-            Pendências iguais
-          </p>
-          <ul aria-labelledby="f-agrupar">
-            <li>
-              <Link href={href({ agrupar: "" })} className="chip" aria-current={agruparIguais ? "true" : undefined}>
-                Agrupar
-              </Link>
-            </li>
-            <li>
-              <Link href={href({ agrupar: "0" })} className="chip" aria-current={!agruparIguais ? "true" : undefined}>
-                Mostrar separadas
-              </Link>
-            </li>
-          </ul>
-        </div>
-        {grupo("Prioridade", "prioridade", PRIO_OPC, busca.prioridade ?? "")}
-        {grupo("Situação", "status", STATUS_OPC, status)}
-        <div className="filtro">
-          <p className="filtro-nome" id="f-cliente">
-            Cliente
-          </p>
-          <ul aria-labelledby="f-cliente">
-            <li>
-              <Link href={href({ cliente: "" })} className="chip" aria-current={!busca.cliente ? "true" : undefined}>
-                Todos
-              </Link>
-            </li>
-            <li>
-              <Link href={href({ cliente: "todos" })} className="chip" aria-current={busca.cliente === "todos" ? "true" : undefined}>
-                Gerais
-              </Link>
-            </li>
-            {clientes.map((c) => (
-              <li key={c.id}>
-                <Link href={href({ cliente: c.slug })} className="chip" aria-current={busca.cliente === c.slug ? "true" : undefined}>
-                  {c.nome}
+        </details>
+        {ativos.length > 0 && (
+          <ul className="filtros-ativos" aria-label="Filtros em uso">
+            {ativos.map((f) => (
+              <li key={f.nome}>
+                <Link href={href({ [f.chave]: "" })} className="chip" aria-current="true">
+                  {f.nome} ×<span className="sr-only">, tirar este filtro</span>
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href={semFiltros} className="link-secao">
+                Limpar filtros
+              </Link>
+            </li>
           </ul>
-        </div>
+        )}
       </div>
 
       <p className="contagem" aria-live="polite">

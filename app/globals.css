@@ -436,25 +436,66 @@ h3 {
 
 /* ---------- Pendências ---------- */
 
-/* Na fila do painel o texto é resumido; o completo está em Pendências */
-.fila .pend-detalhe {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-size: 0.9rem;
-}
-.fila .pend {
-  gap: 0.6rem;
-  padding-block: 0.85rem 0.9rem;
-}
-.fila .acoes {
-  grid-template-columns: minmax(0, 1fr);
-}
-.fila .btn {
-  min-height: 2rem;
-  padding: 0.2rem 0.7rem;
+/* Fila do painel: só o que decidir e onde, um toque abre a parte do perfil com a pendência */
+.dica-secao {
+  margin: -0.35rem 0 0.75rem;
+  max-width: 62ch;
   font-size: 0.86rem;
+  color: var(--tinta-suave);
+}
+.fila-lista {
+  display: grid;
+  border-top: 1px solid var(--linha);
+}
+.fila-item {
+  border-left: 4px solid var(--linha-forte);
+  border-bottom: 1px solid var(--linha);
+  background: var(--papel);
+}
+.fila-item.pend-alta {
+  border-left-width: 6px;
+  border-left-color: var(--terra);
+}
+.fila-item.pend-media {
+  border-left-color: var(--ipe);
+}
+.fila-item.pend-baixa {
+  border-left-width: 2px;
+}
+.fila-item a {
+  display: grid;
+  gap: 0.15rem;
+  min-height: 3.25rem;
+  padding: 0.7rem 0.9rem 0.75rem;
+  text-decoration: none;
+  color: var(--tinta);
+}
+.fila-item a:hover {
+  background: var(--geada);
+}
+.fila-onde {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 560;
+  color: var(--tinta-suave);
+}
+.fila-parte {
+  font-weight: 450;
+}
+.fila-titulo {
+  font-weight: 560;
+  line-height: 1.3;
+}
+.fila-item a:hover .fila-titulo {
+  text-decoration: underline;
+  text-decoration-color: var(--linha-forte);
+  text-underline-offset: 3px;
+}
+.fila-resto {
+  padding-top: 0.7rem;
 }
 
 .lista-pend {
@@ -682,11 +723,79 @@ label {
 
 /* ---------- Filtros ---------- */
 
+.filtros-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+}
+.filtros-caixa summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0.2rem 0.85rem;
+  border: 1px solid var(--linha-forte);
+  border-radius: 999px;
+  background: var(--papel);
+  font-size: 0.88rem;
+  font-weight: 560;
+  cursor: pointer;
+  list-style: none;
+}
+.filtros-caixa summary::-webkit-details-marker {
+  display: none;
+}
+.filtros-caixa summary::after {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-0.12rem) rotate(45deg);
+  transition: transform 0.15s;
+}
+.filtros-caixa[open] summary::after {
+  transform: translateY(0.1rem) rotate(-135deg);
+}
+.filtros-caixa summary:hover {
+  border-color: var(--tinta);
+}
+.filtros-n {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--terra);
+  font-size: 0.76rem;
+  color: #fff;
+}
+/* Fechada, a caixa fica ao lado dos filtros em uso; aberta, ocupa a linha toda abaixo deles */
+.filtros-caixa[open] {
+  order: 2;
+  flex-basis: 100%;
+}
+.filtros-ativos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+}
+.filtros-ativos .link-secao {
+  padding-inline: 0.3rem;
+}
 .filtros {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.9rem;
-  margin-bottom: 1.25rem;
+  margin-top: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--papel);
 }
 .filtro {
   display: grid;
@@ -882,6 +991,7 @@ label {
 
 /* Cada parte do perfil é uma linha que abre: o título diz a situação, o corpo mostra como está e o que decidir */
 .secao-perfil {
+  scroll-margin-top: 1rem;
   border-top: 1px solid var(--linha-forte);
 }
 .secao-perfil:last-child {
@@ -2224,7 +2334,8 @@ input[type="radio"] {
 
 @media (pointer: coarse) {
   .triagem kbd,
-  .triagem-fim kbd {
+  .triagem-fim kbd,
+  .dica-teclado {
     display: none;
   }
 }

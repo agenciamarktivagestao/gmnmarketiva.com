@@ -16,6 +16,9 @@ export const SECOES: { chave: ChaveSecao; nome: string; campos: string[] }[] = [
   { chave: "posts", nome: "Postagens", campos: ["posts"] },
 ];
 
+// A parte do perfil a que um campo do diagnóstico pertence (para links "#parte-<chave>" da página do cliente)
+export const secaoDoCampo = (campo: string): ChaveSecao | null => SECOES.find((s) => s.campos.includes(campo))?.chave ?? null;
+
 const CHAVES = new Set<string>([...SECOES.map((s) => s.chave), "outras"]);
 
 // A que parte do perfil a pendência pertence. A rotina pode dizer em `payload.secao`; sem isso vale o campo

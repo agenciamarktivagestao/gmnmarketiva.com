@@ -23,8 +23,8 @@ export const QUEM: Record<Quem, string> = {
   voce: "Depende de você",
   bloq: "Chrome ou plano pago",
 };
-// Nas abas de Pendências
-export const QUEM_ABA: Record<Quem, string> = { voce: "Você", eu: "Rotina", bloq: "Chrome/plano" };
+// Nas abas de Pendências: o mesmo nome que a etiqueta de cada card usa
+export const QUEM_ABA: Record<Quem, string> = { voce: "Esperam você", eu: "A rotina faz", bloq: "Chrome ou plano pago" };
 
 export const estaAberta = (p: { status: Status }) => p.status === "aberta" || p.status === "aprovada";
 export const STATUS: Record<Status, string> = {

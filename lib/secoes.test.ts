@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { camposDaPendencia } from "./campos-regras.ts";
-import { secaoDe, situacaoDaSecao } from "./secoes.ts";
+import { secaoDe, secaoDoCampo, situacaoDaSecao } from "./secoes.ts";
 
 const de = (titulo: string, payload?: Record<string, unknown>) => secaoDe({ payload }, camposDaPendencia({ titulo }));
 
@@ -66,4 +66,13 @@ test("situação da parte: a pior das chaves, resumo só do que não está em or
   assert.deepEqual(situacaoDaSecao(campos, ["categorias", "endereco"], nome), { nivel: "ok", resumo: "Em ordem" });
   assert.deepEqual(situacaoDaSecao({ ...campos, endereco: { valor: "Falta", nivel: "falta" } }, ["nome", "endereco"], nome).nivel, "falta");
   assert.deepEqual(situacaoDaSecao(undefined, ["nome"], nome), { nivel: null, resumo: "" });
+});
+
+test("cada campo do diagnóstico leva à sua parte do perfil", () => {
+  assert.equal(secaoDoCampo("capa"), "fotos");
+  assert.equal(secaoDoCampo("fotos"), "fotos");
+  assert.equal(secaoDoCampo("endereco"), "nome");
+  assert.equal(secaoDoCampo("categorias"), "nome");
+  assert.equal(secaoDoCampo("posts"), "posts");
+  assert.equal(secaoDoCampo("inexistente"), null);
 });
