@@ -1,6 +1,22 @@
 [
   {
-    "feito_em": "2026-11-17T18:10:00-03:00",
+    "feito_em": "2026-11-17T18:06:34-03:00",
+    "titulo": "Limpa Cano cadastrado, com 15 serviços sugeridos",
+    "resumo": "Novo cliente no painel: Desentupidora e Encanador Limpa Cano, em Londrina. Os serviços que você descreveu nos áudios esperam a sua decisão.",
+    "itens": [
+      "Cliente cadastrado como \"Limpa Cano\", na posição 16, ligado ao perfil do Google dele",
+      "15 serviços sugeridos, escritos só com o que você falou: desentupimento de pia, vaso, ralo, rede de esgoto, rede pluvial, prumada predial e dreno de ar-condicionado; hidrojateamento; limpeza de fossa, de caixa de gordura e de caixa separadora; caça-vazamento; encanamento em geral; dedetização; e desentupimento em geral",
+      "Cada descrição tem até 150 caracteres e não traz preço, prazo nem promessa, como pede a regra das rotinas",
+      "Nada foi enviado ao Google: os serviços ficam como \"sugeridos\" até você aprovar"
+    ],
+    "como_testar": "Abra Limpa Cano no Painel, entre em Serviços e aprove ou recuse cada um.",
+    "pendente": "Faltam a prévia do perfil (a rotina ainda precisa gravar a leitura dele) e a revisão da descrição e das categorias do perfil, que tem um erro de digitação (\"Londina\").",
+    "tipo": "dados",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-17T17:55:00-03:00",
     "titulo": "Registro de mudanças no painel",
     "resumo": "Cada ajuste que eu fizer no sistema passa a aparecer aqui, com data, o que mudou, como conferir e o que ainda falta.",
     "itens": [
@@ -14,7 +30,7 @@
     "como_testar": "Abra Novidades no menu. O selo no menu deve sumir depois que a página abrir. No celular, o aviso no topo do Painel leva à mesma página.",
     "pendente": null,
     "tipo": "painel",
-    "commit_sha": null,
+    "commit_sha": "a746df0",
     "autor": "Claude"
   },
   {
