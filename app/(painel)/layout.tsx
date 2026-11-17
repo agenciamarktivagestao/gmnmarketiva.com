@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Logo } from "@/components/Logo";
 import { NavLinks } from "@/components/NavLinks";
 import { sair } from "@/app/actions";
 import { modoDemonstracao } from "@/lib/ambiente";
@@ -35,9 +37,12 @@ export default async function LayoutPainel({ children }: { children: React.React
         </p>
       )}
       <header className="topo">
-        <p className="marca">
-          Marktiva <span>Perfis</span>
-        </p>
+        <Link href="/" className="topo-logo" aria-label="Marktiva Perfis, ir ao painel">
+          <Logo altura={24} />
+          <span className="topo-nome" aria-hidden="true">
+            Perfis
+          </span>
+        </Link>
         <NavLinks />
         <div className="topo-usuario">
           <span title={usuario.email}>{usuario.email.split("@")[0]}</span>

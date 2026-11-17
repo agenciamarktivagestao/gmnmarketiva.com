@@ -3,7 +3,7 @@ import path from "node:path";
 import { cache } from "react";
 import { modoDemonstracao } from "./ambiente";
 import { supabaseServidor } from "./supabase";
-import type { Cliente, Diagnostico, Evento, Membro, Pendencia, Usuario } from "./tipos";
+import type { Cliente, Conteudo, Diagnostico, Diretriz, Evento, Membro, Midia, Pendencia, Servico, Usuario } from "./tipos";
 
 // ---------------------------------------------------------------------------
 // Modo demonstração: dados da leitura de 16/11/2026, só em memória
@@ -12,7 +12,7 @@ const DEMO_EM = "2026-11-16T21:00:00Z";
 
 type Seed = {
   lido_em: string;
-  clientes: Omit<Cliente, "id">[];
+  clientes: Omit<Cliente, "id" | "servicos_padrao">[];
   diagnosticos: { slug: string; impressoes: number; ligacoes: number; rotas: number; cliques_site: number; campos: Diagnostico["campos"] }[];
   pendencias: { slug: string | null; titulo: string; detalhe: string; prioridade: string; quem: string }[];
 };
@@ -21,7 +21,7 @@ type Seed = {
 const lerSeed = cache((): Seed => JSON.parse(readFileSync(path.join(process.cwd(), "data", "seed.json"), "utf8")));
 
 function demoClientes(): Cliente[] {
-  return lerSeed().clientes.map((c) => ({ ...c, id: `c-${c.slug}` }));
+  return lerSeed().clientes.map((c) => ({ ...c, servicos_padrao: 0, id: `c-${c.slug}` }));
 }
 function demoDiagnosticos(): Diagnostico[] {
   return lerSeed().diagnosticos.map((d) => ({
@@ -78,17 +78,17 @@ export const usuarioAtual = cache(async (): Promise<Usuario | null> => {
   return { email, papel: (membro?.papel as Usuario["papel"]) ?? null };
 });
 
-export async function listarClientes(): Promise<Cliente[]> {
+export const listarClientes = cache(async (): Promise<Cliente[]> => {
   if (modoDemonstracao()) return demoClientes();
   const sb = await supabaseServidor();
   const { data, error } = await sb
     .from("clientes")
-    .select("id,slug,nome,categoria,cidade,gbp_location,ordem")
+    .select("id,slug,nome,categoria,cidade,gbp_location,servicos_padrao,ordem")
     .eq("ativo", true)
     .order("ordem");
   if (error) throw new Error(error.message);
   return data ?? [];
-}
+});
 
 // Último diagnóstico de cada cliente
 export async function listarDiagnosticos(): Promise<Map<string, Diagnostico>> {
@@ -143,4 +143,50 @@ export async function listarEquipe(): Promise<Membro[]> {
   const { data, error } = await sb.from("equipe").select("email,nome,papel").order("criado_em");
   if (error) throw new Error(error.message);
   return (data as Membro[]) ?? [];
+}
+
+// ---------------------------------------------------------------------------
+// Diretrizes, serviços, imagens e conteúdo (só com o Supabase conectado)
+// ---------------------------------------------------------------------------
+export async function listarDiretrizes(): Promise<Diretriz[]> {
+  if (modoDemonstracao()) return [];
+  const sb = await supabaseServidor();
+  const { data, error } = await sb.from("diretrizes").select("*");
+  if (error) throw new Error(error.message);
+  return (data as Diretriz[]) ?? [];
+}
+
+export async function listarServicos(): Promise<Servico[]> {
+  if (modoDemonstracao()) return [];
+  const sb = await supabaseServidor();
+  const { data, error } = await sb
+    .from("servicos")
+    .select("id,cliente_id,nome,descricao,categoria_gbp,status,origem,decidido_por,decidido_em,atualizado_em")
+    .order("criado_em")
+    .order("nome");
+  if (error) throw new Error(error.message);
+  return (data as Servico[]) ?? [];
+}
+
+export async function listarMidias(): Promise<Midia[]> {
+  if (modoDemonstracao()) return [];
+  const sb = await supabaseServidor();
+  const { data, error } = await sb
+    .from("midias")
+    .select("id,cliente_id,caminho,url,nome_original,largura,altura,bytes,categoria,nota,status,enviada_em,criado_por,criado_em")
+    .neq("status", "cancelada")
+    .order("criado_em", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data as Midia[]) ?? [];
+}
+
+export async function listarConteudos(): Promise<Conteudo[]> {
+  if (modoDemonstracao()) return [];
+  const sb = await supabaseServidor();
+  const { data, error } = await sb
+    .from("conteudos")
+    .select("id,cliente_id,tipo,avaliador,estrelas,avaliacao,review_id,texto,midia_id,status,origem,decidido_por,decidido_em,publicado_em,criado_em")
+    .order("criado_em", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data as Conteudo[]) ?? [];
 }

@@ -2,16 +2,58 @@ import Link from "next/link";
 import { ItemPendencia } from "@/components/ItemPendencia";
 import { Matriz } from "@/components/Matriz";
 import { Fase } from "@/components/Fase";
-import { listarClientes, listarDiagnosticos, listarPendencias, usuarioAtual } from "@/lib/dados";
+import {
+  listarClientes,
+  listarConteudos,
+  listarDiagnosticos,
+  listarDiretrizes,
+  listarMidias,
+  listarPendencias,
+  listarServicos,
+  usuarioAtual,
+} from "@/lib/dados";
 import { dataCurta, ordenarPendencias } from "@/lib/rotulos";
 
 export default async function Painel() {
-  const [usuario, clientes, diagnosticos, pendencias] = await Promise.all([
+  const [usuario, clientes, diagnosticos, pendencias, conteudos, midias, servicos, diretrizes] = await Promise.all([
     usuarioAtual(),
     listarClientes(),
     listarDiagnosticos(),
     listarPendencias(),
+    listarConteudos(),
+    listarMidias(),
+    listarServicos(),
+    listarDiretrizes(),
   ]);
+  const textosEsperam = conteudos.filter((c) => c.status === "rascunho").length;
+  const imagensNaFila = midias.filter((m) => m.status === "na_fila").length;
+  const servicosEsperam = servicos.filter((s) => s.status === "sugerido").length;
+  const tonsParaRever = diretrizes.filter((d) => d.cliente_id && !d.revisado).length;
+  // Serviços e imagens são por cliente: o atalho leva ao cliente que tem mais itens esperando
+  const maisFrequente = (ids: string[]) => {
+    const contagem = new Map<string, number>();
+    ids.forEach((id) => contagem.set(id, (contagem.get(id) ?? 0) + 1));
+    const [id] = [...contagem.entries()].sort((a, b) => b[1] - a[1])[0] ?? [];
+    return clientes.find((c) => c.id === id);
+  };
+  const clienteServicos = maisFrequente(servicos.filter((s) => s.status === "sugerido").map((s) => s.cliente_id));
+  const clienteImagens = maisFrequente(midias.filter((m) => m.status === "na_fila").map((m) => m.cliente_id));
+  const resumo = [
+    { href: "/conteudo?situacao=rascunho", n: textosEsperam, um: "texto espera aprovação", varios: "textos esperam aprovação" },
+    {
+      href: clienteServicos ? `/clientes/${clienteServicos.slug}/servicos` : "",
+      n: servicosEsperam,
+      um: "serviço sugerido espera decisão",
+      varios: "serviços sugeridos esperam decisão",
+    },
+    {
+      href: clienteImagens ? `/clientes/${clienteImagens.slug}/imagens` : "",
+      n: imagensNaFila,
+      um: "imagem na fila para o Google",
+      varios: "imagens na fila para o Google",
+    },
+    { href: "/diretrizes", n: tonsParaRever, um: "tom de cliente para revisar", varios: "tons de clientes para revisar" },
+  ];
   const podeEditar = usuario?.papel === "admin" || usuario?.papel === "editor";
   const abertas = pendencias.filter((p) => p.status === "aberta" || p.status === "aprovada");
   const esperam = pendencias.filter((p) => p.quem === "voce" && p.status === "aberta");
@@ -33,6 +75,28 @@ export default async function Painel() {
           {leitura && ` Última leitura dos perfis em ${dataCurta(`${leitura}T12:00:00Z`)}, com dados dos últimos 30 dias.`}
         </p>
       </section>
+
+      <ul className="resumo" aria-label="O que mais espera por você">
+        {resumo.map((r) => {
+          const texto = (
+            <>
+              <strong>{r.n}</strong>
+              <span>{r.n === 1 ? r.um : r.varios}</span>
+            </>
+          );
+          return (
+            <li key={r.um}>
+              {r.n > 0 && r.href ? (
+                <Link href={r.href} className="resumo-item resumo-ativo">
+                  {texto}
+                </Link>
+              ) : (
+                <p className="resumo-item">{texto}</p>
+              )}
+            </li>
+          );
+        })}
+      </ul>
 
       <div className="painel-grade">
         <section aria-labelledby="t-matriz">

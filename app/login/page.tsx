@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { FormLogin } from "@/components/FormLogin";
+import { Logo } from "@/components/Logo";
 import { modoDemonstracao } from "@/lib/ambiente";
 
 export const metadata: Metadata = { title: "Entrar" };
@@ -11,10 +12,10 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
   return (
     <main className="login">
       <div className="login-marca">
-        <p className="marca">
-          Marktiva <span>Perfis</span>
+        <Logo altura={56} />
+        <p className="login-frase">
+          Perfis do Google de todos os clientes: o que falta em cada um, o que a rotina da madrugada já fez e o que você aprova antes de ir ao ar.
         </p>
-        <p className="login-frase">Todos os perfis do Google dos clientes, o que falta em cada um e o que a rotina da madrugada já fez.</p>
       </div>
       <div className="login-caixa">
         <FormLogin

@@ -13,6 +13,7 @@ export type Cliente = {
   categoria: string | null;
   cidade: string | null;
   gbp_location: string | null;
+  servicos_padrao: number;
   ordem: number;
 };
 
@@ -56,3 +57,79 @@ export type Evento = {
 
 export type Membro = { email: string; nome: string | null; papel: Papel };
 export type Usuario = { email: string; papel: Papel | null };
+
+export type Tratamento = "voce" | "senhor" | "neutro";
+export type Emojis = "nenhum" | "poucos" | "livre";
+export type Aprovacao = "automatica" | "manual";
+
+// cliente_id nulo = diretriz geral do sistema
+export type Diretriz = {
+  id: string;
+  cliente_id: string | null;
+  ideia_principal: string;
+  tom: string;
+  tratamento: Tratamento;
+  emojis: Emojis;
+  assinatura: string;
+  usar: string;
+  evitar: string;
+  exemplo_resposta: string;
+  exemplo_postagem: string;
+  aprovacao: Aprovacao;
+  revisado: boolean;
+  atualizado_em: string;
+  atualizado_por: string | null;
+};
+
+export type StatusServico = "no_perfil" | "sugerido" | "aprovado" | "recusado";
+export type Servico = {
+  id: string;
+  cliente_id: string;
+  nome: string;
+  descricao: string;
+  categoria_gbp: string | null;
+  status: StatusServico;
+  origem: "perfil" | "rotina" | "equipe";
+  decidido_por: string | null;
+  decidido_em: string | null;
+  atualizado_em: string;
+};
+
+export type CategoriaMidia = "ADDITIONAL" | "COVER" | "PROFILE";
+export type StatusMidia = "na_fila" | "enviada" | "cancelada";
+export type Midia = {
+  id: string;
+  cliente_id: string;
+  caminho: string;
+  url: string;
+  nome_original: string | null;
+  largura: number | null;
+  altura: number | null;
+  bytes: number | null;
+  categoria: CategoriaMidia;
+  nota: string | null;
+  status: StatusMidia;
+  enviada_em: string | null;
+  criado_por: string | null;
+  criado_em: string;
+};
+
+export type TipoConteudo = "postagem" | "resposta";
+export type StatusConteudo = "rascunho" | "aprovado" | "publicado" | "recusado";
+export type Conteudo = {
+  id: string;
+  cliente_id: string;
+  tipo: TipoConteudo;
+  avaliador: string | null;
+  estrelas: number | null;
+  avaliacao: string | null;
+  review_id: string | null;
+  texto: string;
+  midia_id: string | null;
+  status: StatusConteudo;
+  origem: "rotina" | "equipe";
+  decidido_por: string | null;
+  decidido_em: string | null;
+  publicado_em: string | null;
+  criado_em: string;
+};

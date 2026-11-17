@@ -4,7 +4,9 @@ Painel da Agência Marktiva para gerir os perfis do Google Meu Negócio dos clie
 
 - **Painel**: situação de cada campo do perfil por cliente (cheio = em ordem, meio = a rever, vazio = falta) e a fila do que espera decisão.
 - **Pendências**: aprovar, recusar, marcar como feito e comentar. A rotina da madrugada lê essas decisões.
-- **Clientes**: perfil, desempenho dos últimos 30 dias, pendências e o que já foi feito.
+- **Conteúdo**: postagens e respostas a avaliações com prévia no estilo do Google. Aprovar, recusar, editar o texto ou escrever o seu.
+- **Diretrizes**: a ideia principal do sistema e o tom de cada cliente (tratamento, emojis, assinatura, o que usar e o que evitar, exemplos). A rotina lê antes de escrever qualquer texto.
+- **Clientes**: abas Visão geral, Serviços (aprovar, editar e incluir), Imagens (envio com prévia) e Tom e diretrizes.
 - **Histórico**: tudo o que a rotina e a equipe fizeram, por dia.
 - **Equipe**: quais e-mails podem entrar.
 
@@ -18,6 +20,13 @@ A leitura e a escrita nos perfis do Google acontecem no Claude (conector Windsor
 2. Você decide aqui: aprova, recusa, comenta.
 3. Na rodada seguinte, a rotina lê `pendencias` com `status = 'aprovada'` e os `comentarios` novos, executa o que for possível e marca como `concluida`, registrando em `historico`.
 
+### Tom, serviços, imagens e conteúdo
+
+- **Ideia principal e tom** (`diretrizes`): a linha com `cliente_id` nulo vale para todos; a de cada cliente refina. `revisado = false` significa proposta inicial ainda não conferida pela equipe. `aprovacao = 'manual'` faz a rotina deixar `conteudos` em `rascunho` em vez de publicar.
+- **Serviços** (`servicos`): `no_perfil` já está no Google; `sugerido` espera decisão; `aprovado` a rotina coloca no perfil e depois marca `no_perfil`; `recusado` fica registrado. Editar um serviço que já está no Google vira `aprovado`, para a rotina aplicar a alteração. O Google troca a lista inteira de uma vez, então a rotina sempre reenvia os serviços existentes junto com os novos.
+- **Imagens** (`midias`): o arquivo sobe do navegador para o armazenamento do Supabase (bucket público `midias`, até 10 MB, JPG, PNG ou WebP; fotos de celular e HEIC são convertidas e reduzidas no navegador). A rotina envia ao Google pelo endereço público da imagem e marca `enviada`. Capa só com foto horizontal.
+- **Conteúdo** (`conteudos`): `rascunho` espera decisão; `aprovado` a rotina publica e marca `publicado`; `recusado` fica registrado. Cada decisão entra sozinha em `historico`.
+
 ## Rodar no computador
 
 ```bash
@@ -30,7 +39,7 @@ Sem as duas variáveis o sistema abre em **modo demonstração**: dados de 16/11
 
 ## Banco (Supabase)
 
-As tabelas e as regras de acesso estão em `supabase/migrations`, para rodar em ordem. Os dados iniciais estão em `supabase/seed.sql`.
+As tabelas e as regras de acesso estão em `supabase/migrations`, para rodar em ordem. Os dados iniciais estão em `supabase/seed.sql` (clientes e pendências), `supabase/seed_servicos.sql` (serviços que já estão nos perfis) e `supabase/seed_diretrizes.sql` (primeira proposta de ideia principal e tom).
 
 | Tabela | Para que serve |
 | --- | --- |
@@ -41,6 +50,10 @@ As tabelas e as regras de acesso estão em `supabase/migrations`, para rodar em 
 | `comentarios` | Conversa em cada pendência |
 | `execucoes` | Uma linha por rodada da rotina |
 | `historico` | Cada ação feita, com tipo, cliente e resultado |
+| `diretrizes` | Ideia principal e tom de voz, geral e por cliente |
+| `servicos` | Serviços de cada perfil e a decisão sobre cada um |
+| `midias` | Imagens na fila para subir no Google e as já enviadas (arquivos no bucket `midias`) |
+| `conteudos` | Postagens e respostas a avaliações, do rascunho à publicação |
 
 **Acesso:** todas as tabelas têm segurança por linha. Só e-mails da tabela `equipe` leem; `admin` e `editor` gravam; só `admin` apaga e libera acessos. Quem criar uma conta com outro e-mail não vê nada.
 
@@ -64,9 +77,10 @@ A chave `publishable` é feita para ficar no navegador. A proteção dos dados e
 ## Estrutura
 
 ```
-app/                 páginas (painel, pendências, clientes, histórico, equipe, login)
-app/actions.ts       ações do servidor: decidir, comentar, nova pendência, equipe, entrar/sair
-components/          matriz, itens de pendência, formulários
+app/                 páginas (painel, pendências, conteúdo, diretrizes, clientes, histórico, equipe, login)
+app/actions.ts       ações do servidor: pendências, diretrizes, serviços, imagens, conteúdo, equipe, entrar/sair
+components/          matriz, prévia do Google, galeria de imagens, serviços, formulários
+public/              logo da Marktiva (branca: usar sobre o fundo terra roxa)
 lib/dados.ts         leitura do Supabase (ou dos dados de demonstração)
 data/seed.json       dados de demonstração
 proxy.ts             renova a sessão e manda quem não entrou para /login

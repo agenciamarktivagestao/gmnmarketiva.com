@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Fase } from "@/components/Fase";
@@ -32,17 +31,6 @@ export default async function PaginaCliente({ params }: { params: Promise<{ slug
 
   return (
     <>
-      <p className="migalha">
-        <Link href="/">Painel</Link>
-      </p>
-      <section className="abertura">
-        <h1>{cliente.nome}</h1>
-        <p className="lead">
-          {[cliente.categoria, cliente.cidade].filter(Boolean).join(", ")}
-          {cliente.gbp_location && <span className="id-perfil">Perfil {cliente.gbp_location.replace("locations/", "")}</span>}
-        </p>
-      </section>
-
       {d && (
         <dl className="desempenho" aria-label="Desempenho nos últimos 30 dias">
           <div>
