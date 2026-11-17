@@ -83,6 +83,7 @@ components/          matriz, prévia do Google, galeria de imagens, serviços, f
 public/              logo da Marktiva (branca: usar sobre o fundo terra roxa)
 lib/dados.ts         leitura do Supabase (ou dos dados de demonstração)
 data/seed.json       dados de demonstração
+docs/                documentos de apoio (texto da seção SISTEMA das rotinas)
 proxy.ts             renova a sessão e manda quem não entrou para /login
 supabase/            migrações e dados iniciais
 ```
