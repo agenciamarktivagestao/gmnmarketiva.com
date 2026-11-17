@@ -14,7 +14,10 @@ import {
 } from "@/lib/dados";
 import { dataCurta, ordenarPendencias } from "@/lib/rotulos";
 
-export default async function Painel() {
+export default async function Painel({ searchParams }: { searchParams: Promise<{ ordem?: string; problema?: string }> }) {
+  const busca = await searchParams;
+  const ordenarPorAbertas = busca.ordem === "abertas";
+  const soProblema = busca.problema === "1";
   const [usuario, clientes, diagnosticos, pendencias, conteudos, midias, servicos, diretrizes] = await Promise.all([
     usuarioAtual(),
     listarClientes(),
@@ -54,6 +57,15 @@ export default async function Painel() {
     },
     { href: "/diretrizes", n: tonsParaRever, um: "tom de cliente para revisar", varios: "tons de clientes para revisar" },
   ];
+  // Contadores zerados não aparecem: só entra o que precisa de você
+  const resumoVisivel = resumo.filter((r) => r.n > 0);
+  const hrefPainel = (mudar: { ordem?: string; problema?: string }) => {
+    const novo = { ordem: busca.ordem, problema: busca.problema, ...mudar };
+    const q = new URLSearchParams();
+    Object.entries(novo).forEach(([k, v]) => v && q.set(k, v));
+    const s = q.toString();
+    return s ? `/?${s}` : "/";
+  };
   const podeEditar = usuario?.papel === "admin" || usuario?.papel === "editor";
   const abertas = pendencias.filter((p) => p.status === "aberta" || p.status === "aprovada");
   const esperam = pendencias.filter((p) => p.quem === "voce" && p.status === "aberta");
@@ -76,32 +88,37 @@ export default async function Painel() {
         </p>
       </section>
 
-      <ul className="resumo" aria-label="O que mais espera por você">
-        {resumo.map((r) => {
-          const texto = (
-            <>
-              <strong>{r.n}</strong>
-              <span>{r.n === 1 ? r.um : r.varios}</span>
-            </>
-          );
-          return (
-            <li key={r.um}>
-              {r.n > 0 && r.href ? (
-                <Link href={r.href} className="resumo-item resumo-ativo">
-                  {texto}
-                </Link>
-              ) : (
-                <p className="resumo-item">{texto}</p>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {resumoVisivel.length > 0 && (
+        <ul className="resumo" aria-label="Outras coisas que esperam por você">
+          {resumoVisivel.map((r) => {
+            const texto = (
+              <>
+                <strong>{r.n}</strong>
+                <span>{r.n === 1 ? r.um : r.varios}</span>
+              </>
+            );
+            return (
+              <li key={r.um}>
+                {r.href ? (
+                  <Link href={r.href} className="resumo-item resumo-ativo">
+                    {texto}
+                  </Link>
+                ) : (
+                  <p className="resumo-item">{texto}</p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       <div className="painel-grade">
         <section aria-labelledby="t-matriz">
           <div className="secao-topo">
             <h2 id="t-matriz">Situação de cada perfil</h2>
+            <Link href={hrefPainel({ problema: soProblema ? undefined : "1" })} className="chip" aria-current={soProblema ? "true" : undefined}>
+              Só com problema
+            </Link>
             <ul className="legenda" aria-label="Legenda">
               <li>
                 <Fase nivel="ok" /> Em ordem
@@ -114,7 +131,14 @@ export default async function Painel() {
               </li>
             </ul>
           </div>
-          <Matriz clientes={clientes} diagnosticos={diagnosticos} pendencias={pendencias} />
+          <Matriz
+            clientes={clientes}
+            diagnosticos={diagnosticos}
+            pendencias={pendencias}
+            soProblema={soProblema}
+            ordenarPorAbertas={ordenarPorAbertas}
+            hrefOrdem={hrefPainel({ ordem: ordenarPorAbertas ? undefined : "abertas" })}
+          />
         </section>
 
         <aside aria-labelledby="t-fila" className="fila">

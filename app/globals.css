@@ -356,6 +356,59 @@ h3 {
 .matriz-celula .fase {
   margin: 0 auto;
 }
+/* A bolinha vira link: alvo grande, anel no foco e na passagem do mouse */
+.matriz-ponto {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 2.75rem;
+  border-radius: var(--raio);
+  text-decoration: none;
+}
+.matriz-ponto:hover {
+  background: #eef1ec;
+}
+.matriz-ponto:hover .fase {
+  transform: scale(1.18);
+}
+.matriz-n {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.3rem;
+  min-width: 1rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--terra);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1rem;
+  text-align: center;
+}
+.matriz-ordem {
+  display: inline-block;
+  padding: 0.2rem 0;
+  font-weight: 650;
+  color: var(--tinta-suave);
+  text-decoration: none;
+}
+.matriz-ordem:hover {
+  color: var(--tinta);
+  text-decoration: underline;
+}
+/* "Só com problema": o que está em ordem fica apagado para os problemas saltarem */
+.matriz-foco .fase-ok {
+  opacity: 0.22;
+}
+.matriz-vazia {
+  padding: 1.25rem 1rem !important;
+  color: var(--tinta-suave);
+}
+.secao-topo h2 + .chip {
+  margin-right: auto;
+}
 .matriz-pend {
   white-space: nowrap;
   padding: 0 1rem !important;
@@ -414,13 +467,16 @@ h3 {
   border-left: 4px solid var(--linha-forte);
   border-bottom: 1px solid var(--linha);
 }
+/* Prioridade na borda: cor e espessura (6, 4 e 2 px), para não depender só da cor */
 .pend-alta {
+  border-left-width: 6px;
   border-left-color: var(--terra);
 }
 .pend-media {
   border-left-color: var(--ipe);
 }
 .pend-baixa {
+  border-left-width: 2px;
   border-left-color: var(--linha-forte);
 }
 .pend-concluida,
@@ -627,6 +683,7 @@ label {
 
 .filtros {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.9rem;
   margin-bottom: 1.25rem;
 }
@@ -722,7 +779,6 @@ label {
 }
 .dia h2 {
   margin-bottom: 0.5rem;
-  text-transform: capitalize;
 }
 .eventos {
   display: grid;
@@ -849,17 +905,19 @@ label {
 
 /* ---------- Resumo do painel ---------- */
 
+/* Só aparecem os contadores acima de zero. O fundo em --linha com gap de 1px desenha as divisórias, mesmo quando quebra de linha */
 .resumo {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1px;
   margin-bottom: 2.25rem;
-  background: var(--papel);
+  background: var(--linha);
   border: 1px solid var(--linha);
   border-radius: var(--raio);
   overflow: hidden;
 }
-.resumo li + li {
-  border-left: 1px solid var(--linha);
+.resumo li {
+  background: var(--papel);
 }
 .resumo-item {
   display: grid;
@@ -920,6 +978,12 @@ label {
 }
 .abas + .desempenho {
   margin-top: 0;
+}
+.aba-n {
+  font-weight: 450;
+}
+.abas-pendencias {
+  margin-bottom: 1.25rem;
 }
 
 /* ---------- Formulários grandes: diretrizes e conteúdo ---------- */
@@ -1127,9 +1191,12 @@ label {
   flex-wrap: wrap;
   gap: 0.35rem;
 }
-.filtros {
+.filtros-conteudo {
+  display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
 }
 .filtro-cliente {
   display: flex;
@@ -1276,15 +1343,6 @@ label {
 /* ---------- Telas estreitas ---------- */
 
 @media (max-width: 1040px) {
-  .resumo {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .resumo li:nth-child(3) {
-    border-left: 0;
-  }
-  .resumo li:nth-child(n + 3) {
-    border-top: 1px solid var(--linha);
-  }
   .diretrizes-grade {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
@@ -1320,7 +1378,7 @@ label {
   .resumo-item {
     padding: 0.75rem 0.85rem;
   }
-  .filtros {
+  .filtros-conteudo {
     grid-template-columns: minmax(0, 1fr);
   }
   .filtro-cliente {

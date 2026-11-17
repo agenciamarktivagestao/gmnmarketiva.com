@@ -21,8 +21,12 @@ export const PRIORIDADE: Record<Prioridade, string> = { alta: "Alta", media: "M�
 export const QUEM: Record<Quem, string> = {
   eu: "A rotina faz",
   voce: "Depende de você",
-  bloq: "Só pelo Chrome ou plano pago",
+  bloq: "Chrome ou plano pago",
 };
+// Nas abas de Pendências
+export const QUEM_ABA: Record<Quem, string> = { voce: "Você", eu: "Rotina", bloq: "Chrome/plano" };
+
+export const estaAberta = (p: { status: Status }) => p.status === "aberta" || p.status === "aprovada";
 export const STATUS: Record<Status, string> = {
   aberta: "Aberta",
   aprovada: "Aprovada",

@@ -2,19 +2,22 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { FormNovaPendencia } from "@/components/FormNovaPendencia";
 import { ItemPendencia } from "@/components/ItemPendencia";
+import { camposDaPendencia } from "@/lib/campos";
 import { listarClientes, listarPendencias, usuarioAtual } from "@/lib/dados";
-import { ordenarPendencias } from "@/lib/rotulos";
+import { CAMPOS, QUEM_ABA, ordenarPendencias } from "@/lib/rotulos";
 
 export const metadata: Metadata = { title: "Pendências" };
 
-type Busca = { quem?: string; prioridade?: string; status?: string; cliente?: string };
+type Busca = { quem?: string; prioridade?: string; status?: string; cliente?: string; campo?: string };
 
-const QUEM_OPC = [
-  ["", "Todas"],
-  ["voce", "Dependem de você"],
-  ["eu", "A rotina faz"],
-  ["bloq", "Chrome ou plano pago"],
-];
+const ABAS = [
+  { valor: "voce", nome: QUEM_ABA.voce },
+  { valor: "eu", nome: QUEM_ABA.eu },
+  { valor: "bloq", nome: QUEM_ABA.bloq },
+  { valor: "todas", nome: "Todas" },
+] as const;
+type ValorAba = (typeof ABAS)[number]["valor"];
+
 const PRIO_OPC = [
   ["", "Todas"],
   ["alta", "Alta"],
@@ -33,22 +36,31 @@ const STATUS_OPC = [
 export default async function Pendencias({ searchParams }: { searchParams: Promise<Busca> }) {
   const busca = await searchParams;
   const status = busca.status ?? "abertas";
+  // Sem filtro na URL, a página abre nas pendências que dependem do dono
+  const quem: ValorAba = ABAS.find((a) => a.valor === busca.quem)?.valor ?? "voce";
   const [usuario, clientes, todas] = await Promise.all([usuarioAtual(), listarClientes(), listarPendencias()]);
   const podeEditar = usuario?.papel === "admin" || usuario?.papel === "editor";
   const porId = new Map(clientes.map((c) => [c.id, c]));
   const cliente = clientes.find((c) => c.slug === busca.cliente);
+  const campo = CAMPOS.find((c) => c.chave === busca.campo);
 
-  const filtradas = ordenarPendencias(
-    todas.filter((p) => {
-      if (busca.quem && p.quem !== busca.quem) return false;
-      if (busca.prioridade && p.prioridade !== busca.prioridade) return false;
-      if (status === "abertas" && !(p.status === "aberta" || p.status === "aprovada")) return false;
-      if (status !== "abertas" && status !== "todas" && p.status !== status) return false;
-      if (busca.cliente === "todos" && p.cliente_id) return false;
-      if (cliente && p.cliente_id !== cliente.id) return false;
-      return true;
-    }),
-  );
+  // Tudo menos a aba: assim os números das abas batem com a lista de cada uma
+  const base = todas.filter((p) => {
+    if (busca.prioridade && p.prioridade !== busca.prioridade) return false;
+    if (status === "abertas" && !(p.status === "aberta" || p.status === "aprovada")) return false;
+    if (status !== "abertas" && status !== "todas" && p.status !== status) return false;
+    if (busca.cliente === "todos" && p.cliente_id) return false;
+    if (cliente && p.cliente_id !== cliente.id) return false;
+    if (campo && !camposDaPendencia(p).includes(campo.chave)) return false;
+    return true;
+  });
+  const contagem: Record<ValorAba, number> = {
+    voce: base.filter((p) => p.quem === "voce").length,
+    eu: base.filter((p) => p.quem === "eu").length,
+    bloq: base.filter((p) => p.quem === "bloq").length,
+    todas: base.length,
+  };
+  const filtradas = ordenarPendencias(base.filter((p) => quem === "todas" || p.quem === quem));
 
   const href = (mudar: Partial<Busca>) => {
     const novo = { ...busca, ...mudar };
@@ -87,8 +99,29 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
 
       {podeEditar && <FormNovaPendencia clientes={clientes} />}
 
+      <nav aria-label="Quem resolve" className="abas abas-pendencias">
+        {ABAS.map((a) => (
+          <Link key={a.valor} href={href({ quem: a.valor })} aria-current={quem === a.valor ? "page" : undefined}>
+            {a.nome} <span className="aba-n">({contagem[a.valor]})</span>
+          </Link>
+        ))}
+      </nav>
+
       <div className="filtros">
-        {grupo("Quem resolve", "quem", QUEM_OPC, busca.quem ?? "")}
+        {campo && (
+          <div className="filtro">
+            <p className="filtro-nome" id="f-campo">
+              Campo do perfil
+            </p>
+            <ul aria-labelledby="f-campo">
+              <li>
+                <Link href={href({ campo: "" })} className="chip" aria-current="true">
+                  {campo.nome} ×<span className="sr-only">, tirar este filtro</span>
+                </Link>
+              </li>
+            </ul>
+          </div>
+        )}
         {grupo("Prioridade", "prioridade", PRIO_OPC, busca.prioridade ?? "")}
         {grupo("Situação", "status", STATUS_OPC, status)}
         <div className="filtro">
@@ -121,7 +154,7 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
         {filtradas.length} {filtradas.length === 1 ? "pendência" : "pendências"}
       </p>
       {filtradas.length === 0 ? (
-        <p className="vazio">Nenhuma pendência com esses filtros. Troque a situação ou o cliente para ver mais.</p>
+        <p className="vazio">Nenhuma pendência com esses filtros. Troque a aba, a situação ou o cliente para ver mais.</p>
       ) : (
         <ul className="lista-pend lista-larga">
           {filtradas.map((p) => (

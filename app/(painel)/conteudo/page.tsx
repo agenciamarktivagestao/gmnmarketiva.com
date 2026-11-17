@@ -64,7 +64,7 @@ export default async function PaginaConteudo({ searchParams }: { searchParams: P
         </details>
       )}
 
-      <div className="filtros">
+      <div className="filtros-conteudo">
         <nav aria-label="Situação" className="chips">
           {SITUACOES.map((s) => (
             <Link key={s.valor} href={link(s.valor)} aria-current={filtroSituacao === s.valor ? "true" : undefined} className="chip">
