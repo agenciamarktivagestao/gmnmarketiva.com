@@ -104,6 +104,13 @@ export default async function Pendencias({ searchParams }: { searchParams: Promi
         </p>
       </section>
 
+      <p className="abertura-acoes">
+        <Link className="btn btn-primario" href={quem === "todas" ? "/pendencias/triagem" : `/pendencias/triagem?quem=${quem}`}>
+          Decidir uma por vez
+        </Link>
+        <span className="contagem">Teclado: A aprova, R recusa, C comenta, S pula, Z desfaz.</span>
+      </p>
+
       {podeEditar && <FormNovaPendencia clientes={clientes} />}
 
       <nav aria-label="Quem resolve" className="abas abas-pendencias">

@@ -228,6 +228,23 @@ export async function comentar(id: string, texto: string): Promise<Resultado> {
   return { ok: true };
 }
 
+// Mesmo comentário em várias pendências (card de pendências iguais na triagem): um comentário por pendência,
+// do jeito que a rotina já lê.
+export async function comentarVarias(ids: string[], texto: string): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  const limpo = texto.trim();
+  if (!limpo) return { erro: "Escreva o comentário." };
+  const lista = [...new Set(ids)].filter((i) => /^[0-9a-f-]{36}$/i.test(i)).slice(0, 100);
+  if (!lista.length) return { erro: "Escolha ao menos uma pendência." };
+  const sb = await supabaseServidor();
+  const { data: u } = await sb.auth.getUser();
+  const autor = u.user?.email ?? "equipe";
+  const { error } = await sb.from("comentarios").insert(lista.map((id) => ({ pendencia_id: id, texto: limpo.slice(0, 2000), autor })));
+  if (error) return { erro: error.message };
+  atualizar();
+  return { ok: true };
+}
+
 export async function novaPendencia(_: Resultado | null, dados: FormData): Promise<Resultado> {
   if (modoDemonstracao()) return DEMO;
   const titulo = String(dados.get("titulo") ?? "").trim();
