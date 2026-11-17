@@ -1592,6 +1592,85 @@ input[type="radio"] {
   grid-template-columns: auto minmax(0, 1fr);
 }
 
+/* ---------- Avaliações dentro da pendência ---------- */
+
+.avaliacoes {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  max-width: 46rem;
+}
+.avaliacoes-progresso {
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+.avaliacao {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--linha-forte);
+  border-radius: var(--raio);
+  background: var(--papel);
+}
+.avaliacao-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+}
+.estrelas {
+  color: var(--ipe-texto);
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+}
+.estrelas-baixa {
+  color: var(--terra);
+}
+.estrelas-vazias {
+  color: var(--linha-forte);
+}
+.avaliacao-data {
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+}
+.avaliacao-texto {
+  margin: 0;
+  padding: 0.1rem 0 0.1rem 0.8rem;
+  border-left: 3px solid var(--linha-forte);
+  overflow-wrap: anywhere;
+}
+.avaliacao-sem-texto {
+  color: var(--tinta-suave);
+  font-style: italic;
+}
+.avaliacao-texto .btn {
+  display: inline-flex;
+  min-height: 1.75rem;
+  padding-inline: 0.4rem;
+  font-size: 0.85rem;
+}
+.avaliacao-resposta {
+  display: grid;
+  gap: 0.35rem;
+}
+.avaliacao-resposta textarea {
+  min-height: 6.5rem;
+  overflow-y: hidden;
+  resize: vertical;
+}
+.avaliacao-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+.avaliacao-feita {
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--cafezal);
+  background: #eef5f1;
+  font-weight: 560;
+}
+
 /* ---------- Telas estreitas ---------- */
 
 @media (max-width: 1040px) {

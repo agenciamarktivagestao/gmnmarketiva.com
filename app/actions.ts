@@ -7,7 +7,7 @@ import { modoDemonstracao } from "@/lib/ambiente";
 import { supabaseServidor } from "@/lib/supabase";
 import type { Resultado } from "@/lib/acoes-tipos";
 import { conferirEntrada, conferirEscolha, type Conferida, type Resposta } from "@/lib/respostas";
-import type { PayloadChoose, PayloadInput } from "@/lib/tipos";
+import type { PayloadApprove, PayloadChoose, PayloadInput } from "@/lib/tipos";
 
 const DEMO: Resultado = { erro: "Modo demonstração: conecte o Supabase para salvar." };
 const STATUS = ["aberta", "aprovada", "recusada", "concluida"] as const;
@@ -133,6 +133,84 @@ export async function responder(id: string, r: Resposta): Promise<Resultado> {
     .insert({ pendencia_id: id, texto: `Resposta pelo painel: ${conferida.resumo}`.slice(0, 2000), autor: u.user?.email ?? "equipe" });
   atualizar();
   if (e2) return { erro: "A resposta foi salva, mas o comentário para a rotina falhou. Comente de novo com o que você respondeu." };
+  return { ok: true };
+}
+
+// Avaliações dentro da pendência: cada uma é publicada (vira um conteúdo aprovado, que a rotina
+// publica na próxima rodada) ou vai para revisão do Google. Quando todas têm destino, a pendência
+// vira "aprovada". O andamento fica em `resposta` e cada passo vira um comentário para a rotina.
+export async function responderAvaliacao(id: string, reviewId: string, acao: string, texto?: string): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  if (acao !== "publicar" && acao !== "revisao") return { erro: "Ação inválida." };
+  const sb = await supabaseServidor();
+  const { data: p, error: e0 } = await sb.from("pendencias").select("kind,payload,status,cliente_id,resposta").eq("id", id).maybeSingle();
+  if (e0 || !p) return { erro: "Pendência não encontrada." };
+  if (p.status !== "aberta") return { erro: "Esta pendência já foi decidida. Reabra para responder de novo." };
+  const avaliacoes = (p.payload as PayloadApprove | null)?.avaliacoes ?? [];
+  const av = avaliacoes.find((a) => a.review_id === reviewId);
+  if (!av || !p.cliente_id) return { erro: "Avaliação não encontrada nesta pendência." };
+  const andamento = ((p.resposta as { valor?: Record<string, { acao: string; conteudo_id?: string }> } | null)?.valor ?? {}) as Record<string, { acao: string; conteudo_id?: string }>;
+  if (andamento[reviewId]) return { erro: "Esta avaliação já foi tratada." };
+
+  // Publicar: o texto entra como rascunho e só vira "aprovado" depois que a pendência registrou a decisão
+  let conteudoId: string | undefined;
+  if (acao === "publicar") {
+    const limpo = String(texto ?? "").trim().slice(0, 4000);
+    const falha = validarTexto("resposta", limpo);
+    if (falha) return { erro: falha };
+    const { data: c, error: e1 } = await sb
+      .from("conteudos")
+      .insert({
+        cliente_id: p.cliente_id,
+        tipo: "resposta",
+        avaliador: av.avaliador.slice(0, 120),
+        estrelas: av.estrelas >= 1 && av.estrelas <= 5 ? av.estrelas : null,
+        avaliacao: av.texto ? av.texto.slice(0, 2000) : null,
+        review_id: av.review_id,
+        texto: limpo,
+        status: "rascunho",
+        origem: "equipe",
+      })
+      .select("id")
+      .single();
+    if (e1 || !c) return { erro: "Sem permissão para criar a resposta." };
+    conteudoId = c.id;
+  }
+
+  const novo = { ...andamento, [reviewId]: { acao, ...(conteudoId ? { conteudo_id: conteudoId } : {}) } };
+  const todas = avaliacoes.every((a) => novo[a.review_id]);
+  const nota = `${av.avaliador} (${av.estrelas}★)`;
+  const linha = acao === "publicar" ? `${nota}: resposta aprovada para publicar` : `${nota}: pedir revisão ao Google`;
+  const resumo = avaliacoes
+    .filter((a) => novo[a.review_id])
+    .map((a) => `${a.avaliador} (${a.estrelas}★): ${novo[a.review_id].acao === "publicar" ? "resposta aprovada" : "revisão pedida ao Google"}`)
+    .join("; ");
+  const resposta = { tipo: "avaliacoes", valor: novo, resumo, em: new Date().toISOString() };
+  const { data, error } = await sb
+    .from("pendencias")
+    .update({ resposta, status: todas ? "aprovada" : "aberta" })
+    .eq("id", id)
+    .eq("status", "aberta")
+    .select("id");
+  if (error || !data?.length) {
+    if (conteudoId) await sb.from("conteudos").delete().eq("id", conteudoId).eq("status", "rascunho");
+    return { erro: error?.message ?? "Sem permissão ou a pendência já mudou. Atualize a página." };
+  }
+
+  if (conteudoId) {
+    const { error: e2 } = await sb.from("conteudos").update({ status: "aprovado" }).eq("id", conteudoId).eq("status", "rascunho");
+    if (e2) {
+      atualizar();
+      return { erro: "A decisão foi registrada, mas a resposta ficou como rascunho. Aprove o texto em Conteúdo." };
+    }
+  }
+  const { data: u } = await sb.auth.getUser();
+  await sb.from("comentarios").insert({
+    pendencia_id: id,
+    texto: `Resposta pelo painel: ${linha}${acao === "revisao" ? ". A rotina não consegue pedir revisão; é pelo perfil, no Chrome." : "."}`.slice(0, 2000),
+    autor: u.user?.email ?? "equipe",
+  });
+  atualizar();
   return { ok: true };
 }
 

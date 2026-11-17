@@ -4,6 +4,7 @@ import { useId, useState, useTransition } from "react";
 import { responder } from "@/app/actions";
 import { DIAS, type DiaHorario } from "@/lib/respostas";
 import type { DiaSemana, Pendencia, PayloadApprove, PayloadChoose, PayloadExternal, PayloadInput, Status } from "@/lib/tipos";
+import { Avaliacoes } from "./Avaliacoes";
 import { UploadPendencia } from "./UploadPendencia";
 
 // Envia a resposta e guarda o estado de "salvando" e o erro, igual para todos os tipos
@@ -358,7 +359,10 @@ export function Decisao({
     if (entrada.campo === "checklist") return <Lista p={p} payload={entrada} />;
     return <Texto p={p} payload={entrada} />;
   }
-  const rotulo = (payload as PayloadApprove).rotulo ?? "Aprovar";
+  const aprovacao = payload as PayloadApprove;
+  // Com avaliações, cada uma tem a sua resposta e os seus botões; não existe "Aprovar" para a pendência toda
+  if (aprovacao.avaliacoes?.length) return <Avaliacoes p={p} payload={aprovacao} podeEditar={podeEditar} />;
+  const rotulo = aprovacao.rotulo ?? "Aprovar";
   return (
     <div>
       <button type="button" className="btn btn-primario" disabled={pendente} onClick={() => mudar("aprovada")}>

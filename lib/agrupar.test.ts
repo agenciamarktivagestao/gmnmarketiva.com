@@ -29,3 +29,9 @@ test("pendência sem kind conta como approve", () => {
   assert.equal(r.length, 1);
   assert.equal(r[0].tipo, "grupo");
 });
+
+test("pendência com avaliações nunca entra em grupo", () => {
+  const av = { avaliacoes: [{ review_id: "r1" }] };
+  const r = agrupar([p("1", "Avaliação sem resposta", { payload: av }), p("2", "Avaliação sem resposta", { payload: av }), p("3", "Avaliação sem resposta")]);
+  assert.ok(r.every((e) => e.tipo === "item"));
+});

@@ -17,7 +17,8 @@ export function ItemPendencia({
   // "Depende de você" é o caso comum e não vira etiqueta; só as exceções aparecem.
   const excecao = p.quem !== "voce";
   // Perguntas que pedem escolha, dado ou foto precisam de mais largura que um botão
-  const larga = p.status === "aberta" && podeEditar && (p.kind === "choose" || p.kind === "input" || p.kind === "upload");
+  const comAvaliacoes = ((p.payload as { avaliacoes?: unknown[] } | null)?.avaliacoes?.length ?? 0) > 0;
+  const larga = p.status === "aberta" && (comAvaliacoes || (podeEditar && (p.kind === "choose" || p.kind === "input" || p.kind === "upload")));
   return (
     <li className={`pend pend-${p.prioridade} pend-${p.status}${larga ? " pend-larga" : ""}`}>
       <div className="pend-corpo">

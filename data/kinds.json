@@ -451,5 +451,71 @@
   "payload": {
    "rotulo": "Responder as avaliações"
   }
+ },
+ {
+  "titulo": "3 avaliações de 1 estrela sem resposta",
+  "cliente": "otica-av-rio-de-janeiro",
+  "demo": true,
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Responder as avaliações",
+   "aviso": "Exemplo do modo demonstração: avaliações e nomes inventados.",
+   "avaliacoes": [
+    {
+     "review_id": "demo-1",
+     "avaliador": "Cliente Exemplo A",
+     "estrelas": 1,
+     "texto": "Esperei muito tempo e saí sem resolver o meu pedido. Não gostei do atendimento.",
+     "data": "2026-11-06T20:00:00Z",
+     "resposta_sugerida": "Olá, Cliente Exemplo A! Lamentamos que a sua visita não tenha sido como esperava. Queremos entender o que aconteceu. Fale com a unidade Av. Rio de Janeiro pelo WhatsApp do perfil.\n\nEquipe Óticas Gouveia"
+    },
+    {
+     "review_id": "demo-2",
+     "avaliador": "Cliente Exemplo B",
+     "estrelas": 2,
+     "texto": "Os óculos ficaram prontos, mas o ajuste da armação demorou mais do que eu imaginava. Passei duas vezes na loja para acertar o encaixe e, nas duas, fui atendido por pessoas diferentes que precisaram começar a conversa do zero. No fim deu certo, mas poderia ter sido mais simples e mais rápido para quem já tinha ido antes.",
+     "data": "2026-11-07T14:30:00Z",
+     "resposta_sugerida": "Olá, Cliente Exemplo B! Obrigado por contar como foi. Queremos entender o que aconteceu no ajuste da sua armação. Fale com a unidade Av. Rio de Janeiro pelo WhatsApp do perfil.\n\nEquipe Óticas Gouveia"
+    }
+   ]
+  }
+ },
+ {
+  "titulo": "2 avaliações retidas",
+  "cliente": "garagem-3",
+  "demo": true,
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Responder as avaliações",
+   "avaliacoes": [
+    {
+     "review_id": "demo-3",
+     "avaliador": "Cliente Exemplo C",
+     "estrelas": 5,
+     "texto": null,
+     "data": "2026-10-29T18:00:00Z",
+     "resposta_sugerida": "Cliente Exemplo C, obrigado pela nota e pela confiança na Garagem 3! Quando precisar comprar, trocar ou avaliar um veículo em Londrina, é só falar com a nossa equipe.\n\nEquipe Garagem 3"
+    }
+   ]
+  }
+ },
+ {
+  "titulo": "Avaliação sem resposta",
+  "cliente": "aline-ceccotti",
+  "demo": true,
+  "kind": "approve",
+  "payload": {
+   "rotulo": "Publicar resposta",
+   "avaliacoes": [
+    {
+     "review_id": "demo-4",
+     "avaliador": "Cliente Exemplo D",
+     "estrelas": 4,
+     "texto": "Gostei do atendimento e do cuidado.",
+     "data": "2026-10-29T18:00:00Z",
+     "resposta_sugerida": "Cliente Exemplo D, obrigada pela avaliação e pela confiança! Na Aline Ceccotti Estética Avançada, em Cambé, seguimos à disposição para a sua próxima avaliação individual.\n\nAline Ceccotti Estética Avançada"
+    }
+   ]
+  }
  }
 ]

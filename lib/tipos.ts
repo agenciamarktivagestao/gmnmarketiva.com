@@ -36,7 +36,16 @@ export type OpcaoEscolha = { valor: string; rotulo: string; detalhe?: string };
 export type DiaSemana = "seg" | "ter" | "qua" | "qui" | "sex" | "sab" | "dom";
 
 // O que cada tipo de pendência guarda em `payload` (tudo opcional: o painel tem um padrão para cada campo)
-export type PayloadApprove = { rotulo?: string };
+// Uma avaliação do Google que espera resposta, com a resposta sugerida no tom do cliente
+export type Avaliacao = {
+  review_id: string;
+  avaliador: string;
+  estrelas: number;
+  texto?: string | null;
+  data: string; // ISO: quando a avaliação foi escrita
+  resposta_sugerida: string;
+};
+export type PayloadApprove = { rotulo?: string; avaliacoes?: Avaliacao[]; aviso?: string };
 export type PayloadChoose = { pergunta?: string; opcoes?: OpcaoEscolha[]; permitir_outro?: boolean };
 export type PayloadInput = {
   campo?: "cidades" | "horario" | "checklist" | "texto";

@@ -11,7 +11,12 @@ const semAcento = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLo
 // atinja uma pendência que está em outro ponto do fluxo. A ordem da lista é mantida:
 // o grupo fica onde está o seu primeiro item.
 export function agrupar(lista: Pendencia[]): Entrada[] {
-  const chaveDe = (p: Pendencia) => [semAcento(p.titulo), p.quem, p.status, p.kind ?? "approve"].join("|");
+  // Pendência com avaliações precisa de decisão avaliação por avaliação: cada uma tem chave própria e nunca agrupa
+  const temAvaliacoes = (p: Pendencia) => {
+    const av = (p.payload as { avaliacoes?: unknown[] } | null | undefined)?.avaliacoes;
+    return Array.isArray(av) && av.length > 0;
+  };
+  const chaveDe = (p: Pendencia) => [semAcento(p.titulo), p.quem, p.status, p.kind ?? "approve", temAvaliacoes(p) ? p.id : ""].join("|");
   const porChave = new Map<string, Pendencia[]>();
   lista.forEach((p) => porChave.set(chaveDe(p), [...(porChave.get(chaveDe(p)) ?? []), p]));
 
