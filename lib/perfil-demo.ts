@@ -8,10 +8,10 @@ const imagem = (cor1: string, cor2: string, rotulo: string) =>
   )}`;
 
 const FOTOS: FotoPerfil[] = [
-  { url: imagem("#4e1b27", "#8c2f39", "Capa de exemplo"), categoria: "capa", largura: 600, altura: 450, criada_em: "2026-11-10T12:00:00Z" },
-  { url: imagem("#2e6b57", "#245443", "Foto de exemplo 1"), categoria: "foto", largura: 600, altura: 450, criada_em: "2026-11-08T12:00:00Z" },
-  { url: imagem("#75510a", "#e3a600", "Foto de exemplo 2"), categoria: "foto", largura: 600, altura: 450, criada_em: "2026-11-05T12:00:00Z" },
-  { url: imagem("#5f5258", "#261b20", "Foto de exemplo 3"), categoria: "foto", largura: 600, altura: 450, criada_em: "2026-11-02T12:00:00Z" },
+  { url: imagem("#0a0b10", "#1457e6", "Capa de exemplo"), categoria: "capa", largura: 600, altura: 450, criada_em: "2026-11-10T12:00:00Z" },
+  { url: imagem("#1457e6", "#0f43b8", "Foto de exemplo 1"), categoria: "foto", largura: 600, altura: 450, criada_em: "2026-11-08T12:00:00Z" },
+  { url: imagem("#0f43b8", "#6aa2ff", "Foto de exemplo 2"), categoria: "foto", largura: 600, altura: 450, criada_em: "2026-11-05T12:00:00Z" },
+  { url: imagem("#4b5366", "#0a0b10", "Foto de exemplo 3"), categoria: "foto", largura: 600, altura: 450, criada_em: "2026-11-02T12:00:00Z" },
 ];
 
 const DIAS_UTEIS: DiaSemana[] = ["seg", "ter", "qua", "qui", "sex"];

@@ -80,7 +80,7 @@ A chave `publishable` é feita para ficar no navegador. A proteção dos dados e
 app/                 páginas (painel, pendências, conteúdo, diretrizes, clientes, histórico, equipe, login)
 app/actions.ts       ações do servidor: pendências, diretrizes, serviços, imagens, conteúdo, equipe, entrar/sair
 components/          matriz, prévia do Google, galeria de imagens, serviços, formulários
-public/              logo da Marktiva (branca: usar sobre o fundo terra roxa)
+public/              logo da Marktiva (branca: usar sobre o fundo preto)
 lib/dados.ts         leitura do Supabase (ou dos dados de demonstração)
 data/seed.json       dados de demonstração
 docs/                documentos de apoio (texto da seção SISTEMA das rotinas)
