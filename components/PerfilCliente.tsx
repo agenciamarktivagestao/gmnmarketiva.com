@@ -15,8 +15,8 @@ import {
   type DadosPerfil,
   type PerfilLido,
 } from "@/lib/perfil";
-import { NIVEL, TIPO_EVENTO, dataCurta, estaAberta, hora } from "@/lib/rotulos";
-import { SECOES, secaoDe, situacaoDaSecao, type ChaveSecao } from "@/lib/secoes";
+import { CAMPOS, NIVEL, TIPO_EVENTO, dataCurta, estaAberta, hora } from "@/lib/rotulos";
+import { SECOES, secaoDe, secaoDoCampo, situacaoDaSecao, type ChaveSecao } from "@/lib/secoes";
 import type { Cliente, Diagnostico, Evento, Pendencia } from "@/lib/tipos";
 
 const MAX_SERVICOS = 18;
@@ -43,6 +43,13 @@ export function PerfilCliente({ cliente, perfil, diagnostico, pendencias, evento
   const abertas = pendencias.filter(estaAberta);
   const partesComPendencia = new Set(abertas.map((p) => secaoDe(p, camposDaPendencia(p)))).size;
 
+  // O que falta ou está a rever, do pior para o menos grave; dentro de cada nível, a ordem do painel
+  const foraDeOrdem = CAMPOS.flatMap((c) => {
+    const campo = diagnostico?.campos?.[c.chave];
+    return campo && campo.nivel !== "ok" ? [{ ...c, ...campo }] : [];
+  }).sort((a, b) => (a.nivel === b.nivel ? 0 : a.nivel === "falta" ? -1 : 1));
+  const camposLidos = CAMPOS.filter((c) => diagnostico?.campos?.[c.chave]).length;
+
   const secoes = [
     ...SECOES.map((s) => ({ ...s, ...situacaoDaSecao(diagnostico?.campos, s.campos, nomeDoCampo), pend: porSecao.get(s.chave) ?? [] })),
     { chave: "outras" as const, nome: "Outras pendências", campos: [], nivel: null, resumo: "", pend: porSecao.get("outras") ?? [] },
@@ -52,6 +59,46 @@ export function PerfilCliente({ cliente, perfil, diagnostico, pendencias, evento
     <div className="perfil-grade">
       <aside className="perfil-lateral" aria-label="Como o perfil aparece no Google">
         <CartaoGoogle cliente={cliente} dados={dados} />
+        {camposLidos > 0 && (
+          <section aria-labelledby="t-faltas" className="perfil-faltas-caixa">
+            <h2 className="perfil-sub" id="t-faltas">
+              O que falta neste perfil
+            </h2>
+            {foraDeOrdem.length === 0 ? (
+              <p className="perfil-faltas-resumo">Nada falta: os {camposLidos} campos lidos estão em ordem.</p>
+            ) : (
+              <>
+                <p className="perfil-faltas-resumo">
+                  {foraDeOrdem.length} de {camposLidos} campos precisam de atenção. Toque num deles para ir à parte do perfil.
+                </p>
+                <ul className="perfil-faltas">
+                  {foraDeOrdem.map((c) => {
+                    const doCampo = abertas.filter((p) => camposDaPendencia(p).includes(c.chave));
+                    return (
+                      <li key={c.chave}>
+                        <a href={`#parte-${secaoDoCampo(c.chave) ?? "outras"}`}>
+                          <Fase nivel={c.nivel} />
+                          <span className="faltas-texto">
+                            <span className="faltas-linha">
+                              <span className="faltas-nome">{c.nome}</span>
+                              <span className="faltas-valor">{c.valor}</span>
+                            </span>
+                            {doCampo.length > 0 && (
+                              <span className="faltas-motivo">
+                                {doCampo[0].titulo}
+                                {doCampo.length > 1 && ` e mais ${doCampo.length - 1}`}
+                              </span>
+                            )}
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
+          </section>
+        )}
         {diagnostico && (
           <>
             <h2 className="perfil-sub">Últimos 30 dias</h2>
