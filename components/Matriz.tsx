@@ -18,7 +18,7 @@ export function Matriz({
   pendencias: Pendencia[];
   soProblema: boolean;
   ordenarPorAbertas: boolean;
-  hrefOrdem: string; // liga e desliga a ordenação por "Abertas"
+  hrefOrdem?: string; // liga e desliga a ordenação por "Abertas"; sem ele a coluna não é ordenável
 }) {
   const abertas = pendencias.filter(estaAberta);
 
@@ -64,10 +64,14 @@ export function Matriz({
                 <span>{c.nome}</span>
               </th>
             ))}
-            <th scope="col" className="matriz-pend" aria-sort={ordenarPorAbertas ? "descending" : "none"}>
-              <Link href={hrefOrdem} className="matriz-ordem" title="Ordenar pelos perfis com mais pendências abertas">
-                Abertas<span aria-hidden="true"> {ordenarPorAbertas ? "↓" : "↕"}</span>
-              </Link>
+            <th scope="col" className="matriz-pend" aria-sort={hrefOrdem ? (ordenarPorAbertas ? "descending" : "none") : undefined}>
+              {hrefOrdem ? (
+                <Link href={hrefOrdem} className="matriz-ordem" title="Ordenar pelos perfis com mais pendências abertas">
+                  Abertas<span aria-hidden="true"> {ordenarPorAbertas ? "↓" : "↕"}</span>
+                </Link>
+              ) : (
+                "Abertas"
+              )}
             </th>
           </tr>
         </thead>

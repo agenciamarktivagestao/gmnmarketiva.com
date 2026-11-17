@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Matriz } from "@/components/Matriz";
 import { Fase } from "@/components/Fase";
+import { Matriz } from "@/components/Matriz";
 import {
   listarClientes,
   listarConteudos,
@@ -10,16 +10,13 @@ import {
   listarPendencias,
   listarServicos,
 } from "@/lib/dados";
-import { camposDaPendencia } from "@/lib/campos";
-import { PRIORIDADE, dataCurta, estaAberta, ordenarPendencias } from "@/lib/rotulos";
-import { SECOES, secaoDe } from "@/lib/secoes";
+import { CAMPOS, dataCurta, estaAberta } from "@/lib/rotulos";
 
 const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
 
-export default async function Painel({ searchParams }: { searchParams: Promise<{ ordem?: string; problema?: string }> }) {
+export default async function Painel({ searchParams }: { searchParams: Promise<{ ordem?: string }> }) {
   const busca = await searchParams;
-  const ordenarPorAbertas = busca.ordem === "abertas";
-  const soProblema = busca.problema === "1";
+  const porNome = busca.ordem === "nome";
   const [clientes, diagnosticos, pendencias, conteudos, midias, servicos, diretrizes] = await Promise.all([
     listarClientes(),
     listarDiagnosticos(),
@@ -60,13 +57,6 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
   ];
   // Contadores zerados não aparecem: só entra o que precisa de você
   const resumoVisivel = resumo.filter((r) => r.n > 0);
-  const hrefPainel = (mudar: { ordem?: string; problema?: string }) => {
-    const novo = { ordem: busca.ordem, problema: busca.problema, ...mudar };
-    const q = new URLSearchParams();
-    Object.entries(novo).forEach(([k, v]) => v && q.set(k, v));
-    const s = q.toString();
-    return s ? `/?${s}` : "/";
-  };
   const abertas = pendencias.filter(estaAberta);
   const esperam = pendencias.filter((p) => p.quem === "voce" && p.status === "aberta");
   const altasEsperam = esperam.filter((p) => p.prioridade === "alta").length;
@@ -79,10 +69,29 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
     rotinaFaz > 0 && `${plural(rotinaFaz, "a rotina faz sozinha", "a rotina faz sozinhas")}`,
     bloqueadas > 0 && `${plural(bloqueadas, "depende", "dependem")} de Chrome ou de plano pago`,
   ].filter((t): t is string => !!t);
-  const fila = ordenarPendencias(esperam).slice(0, 6);
-  const porId = new Map(clientes.map((c) => [c.id, c]));
-  const nomeDaParte = new Map<string, string>(SECOES.map((x) => [x.chave, x.nome]));
+  const geraisEsperam = esperam.filter((p) => !p.cliente_id);
   const leitura = [...diagnosticos.values()].map((d) => d.lido_em).sort().at(-1);
+
+  // Uma linha por cliente: quantas decisões esperam e o que falta no perfil, em palavras
+  const linhas = clientes.map((c) => {
+    const campos = CAMPOS.flatMap((x) => {
+      const k = diagnosticos.get(c.id)?.campos?.[x.chave];
+      return k ? [{ nome: x.nome, nivel: k.nivel }] : [];
+    });
+    const minhas = esperam.filter((p) => p.cliente_id === c.id);
+    return {
+      c,
+      lido: campos.length > 0,
+      falta: campos.filter((x) => x.nivel === "falta").map((x) => x.nome),
+      rever: campos.filter((x) => x.nivel === "rever").map((x) => x.nome),
+      esperam: minhas.length,
+      altas: minhas.filter((p) => p.prioridade === "alta").length,
+    };
+  });
+  const nome = (a: { c: { nome: string } }, b: { c: { nome: string } }) => a.c.nome.localeCompare(b.c.nome, "pt-BR");
+  linhas.sort(porNome ? nome : (a, b) => b.esperam - a.esperam || b.altas - a.altas || b.falta.length - a.falta.length || nome(a, b));
+  const clientesNaOrdem = linhas.map((l) => l.c);
+  const href = (ordem?: string) => (ordem ? `/?ordem=${ordem}` : "/");
 
   return (
     <>
@@ -113,99 +122,101 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
       </section>
 
       {resumoVisivel.length > 0 && (
-        <ul className="resumo" aria-label="Outras coisas que esperam por você">
+        <p className="tambem-esperam">
+          <span>Também esperam você:</span>
           {resumoVisivel.map((r) => {
-            const texto = (
-              <>
-                <strong>{r.n}</strong>
-                <span>{r.n === 1 ? r.um : r.varios}</span>
-              </>
-            );
-            return (
-              <li key={r.um}>
-                {r.href ? (
-                  <Link href={r.href} className="resumo-item resumo-ativo">
-                    {texto}
-                  </Link>
-                ) : (
-                  <p className="resumo-item">{texto}</p>
-                )}
-              </li>
+            const texto = `${r.n} ${r.n === 1 ? r.um : r.varios}`;
+            return r.href ? (
+              <Link key={r.um} href={r.href}>
+                {texto}
+              </Link>
+            ) : (
+              <span key={r.um}>{texto}</span>
             );
           })}
-        </ul>
+        </p>
       )}
 
-      <div className="painel-grade">
-        <section aria-labelledby="t-matriz">
-          <div className="secao-topo">
-            <h2 id="t-matriz">Situação de cada perfil</h2>
-            <Link href={hrefPainel({ problema: soProblema ? undefined : "1" })} className="chip" aria-current={soProblema ? "true" : undefined}>
-              Só com problema
-            </Link>
-            <ul className="legenda" aria-label="Legenda">
-              <li>
-                <Fase nivel="ok" /> Em ordem
-              </li>
-              <li>
-                <Fase nivel="rever" /> A rever
-              </li>
-              <li>
-                <Fase nivel="falta" /> Falta
-              </li>
-            </ul>
-          </div>
-          <p className="dica-secao">
-            Clique numa bolinha para abrir essa parte do perfil do cliente.
-            {leitura && ` Leitura de ${dataCurta(`${leitura}T12:00:00Z`)}, com dados dos últimos 30 dias.`}
-          </p>
-          <Matriz
-            clientes={clientes}
-            diagnosticos={diagnosticos}
-            pendencias={pendencias}
-            soProblema={soProblema}
-            ordenarPorAbertas={ordenarPorAbertas}
-            hrefOrdem={hrefPainel({ ordem: ordenarPorAbertas ? undefined : "abertas" })}
-          />
-        </section>
+      <section aria-labelledby="t-clientes">
+        <div className="secao-topo">
+          <h2 id="t-clientes">Seus clientes</h2>
+          <Link href={href(porNome ? undefined : "nome")} className="chip" aria-current={porNome ? "true" : undefined}>
+            Ordem alfabética
+          </Link>
+        </div>
+        <p className="dica-secao">
+          {porNome ? "Em ordem alfabética." : "Primeiro os que têm mais decisões esperando."} Toque num cliente para ver o perfil dele e decidir ali.
+          {leitura && ` Leitura de ${dataCurta(`${leitura}T12:00:00Z`)}, com dados dos últimos 30 dias.`}
+        </p>
+        <ul className="clientes-lista">
+          {geraisEsperam.length > 0 && (
+            <li>
+              <Link href="/pendencias?quem=voce&cliente=todos" className="cliente-linha">
+                <span className="cliente-nome">Pendências gerais</span>
+                <span className="cliente-falta">Valem para todos os perfis, não para um só.</span>
+                <span className="cliente-conta">
+                  <strong>{geraisEsperam.length}</strong>
+                  <span>{geraisEsperam.length === 1 ? "decisão" : "decisões"}</span>
+                </span>
+              </Link>
+            </li>
+          )}
+          {linhas.map((l) => (
+            <li key={l.c.id}>
+              <Link href={`/clientes/${l.c.slug}`} className="cliente-linha">
+                <span className="cliente-nome">{l.c.nome}</span>
+                <span className="cliente-falta">
+                  {!l.lido ? (
+                    "A rotina ainda não leu este perfil."
+                  ) : l.falta.length === 0 && l.rever.length === 0 ? (
+                    "Tudo em ordem."
+                  ) : (
+                    <>
+                      {l.falta.length > 0 && (
+                        <span>
+                          <Fase nivel="falta" /> <strong>Falta:</strong> {l.falta.join(", ")}.
+                        </span>
+                      )}
+                      {l.rever.length > 0 && (
+                        <span>
+                          <Fase nivel="rever" /> <strong>A rever:</strong> {l.rever.join(", ")}.
+                        </span>
+                      )}
+                    </>
+                  )}
+                </span>
+                <span className={`cliente-conta${l.esperam === 0 ? " cliente-conta-zero" : ""}`}>
+                  {l.esperam === 0 ? (
+                    <span>Nada espera</span>
+                  ) : (
+                    <>
+                      <strong>{l.esperam}</strong>
+                      <span>{l.esperam === 1 ? "decisão" : "decisões"}</span>
+                      {l.altas > 0 && <span className="cliente-altas">{l.altas === 1 ? "1 alta" : `${l.altas} altas`}</span>}
+                    </>
+                  )}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        {fila.length > 0 && (
-          <aside aria-labelledby="t-fila" className="fila">
-            <div className="secao-topo">
-              <h2 id="t-fila">Primeiras da fila</h2>
-            </div>
-            <ul className="fila-lista">
-              {fila.map((p) => {
-                const cliente = p.cliente_id ? porId.get(p.cliente_id) : undefined;
-                const parte = secaoDe(p, camposDaPendencia(p));
-                // Com cliente, abre a parte do perfil onde a pendência está; sem cliente, a lista das gerais
-                const destino = cliente ? `/clientes/${cliente.slug}#parte-${parte}` : "/pendencias?quem=voce&cliente=todos";
-                return (
-                  <li key={p.id} className={`fila-item pend-${p.prioridade}`}>
-                    <Link href={destino}>
-                      <span className="fila-onde">
-                        <span>{cliente ? cliente.nome : "Todos os perfis"}</span>
-                        {cliente && <span className="fila-parte">{nomeDaParte.get(parte) ?? "Outras"}</span>}
-                      </span>
-                      <span className="fila-titulo">
-                        {p.titulo}
-                        <span className="sr-only">. Prioridade {PRIORIDADE[p.prioridade].toLowerCase()}.</span>
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-            {esperam.length > fila.length && (
-              <p className="fila-resto">
-                <Link href="/pendencias?quem=voce" className="link-secao">
-                  Mais {esperam.length - fila.length} na lista
-                </Link>
-              </p>
-            )}
-          </aside>
-        )}
-      </div>
+      <details className="nova matriz-caixa">
+        <summary>Comparar todos os perfis numa tabela</summary>
+        <ul className="legenda" aria-label="Legenda">
+          <li>
+            <Fase nivel="ok" /> Em ordem
+          </li>
+          <li>
+            <Fase nivel="rever" /> A rever
+          </li>
+          <li>
+            <Fase nivel="falta" /> Falta
+          </li>
+        </ul>
+        <Matriz clientes={clientesNaOrdem} diagnosticos={diagnosticos} pendencias={pendencias} soProblema={false} ordenarPorAbertas={false} />
+      </details>
     </>
   );
 }
