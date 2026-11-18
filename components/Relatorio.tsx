@@ -25,9 +25,9 @@ export function Relatorio({
   diagnostico,
   geradoEm,
 }: {
-  cliente: Cliente;
+  cliente: Pick<Cliente, "nome" | "categoria" | "cidade">;
   semana: Semana;
-  diagnostico?: Diagnostico;
+  diagnostico?: Pick<Diagnostico, "lido_em" | "impressoes" | "ligacoes" | "rotas" | "cliques_site"> | null;
   geradoEm: Date;
 }) {
   const diasComAcao = semana.dias.filter((d) => semana.totalPorDia[d.chave] > 0);

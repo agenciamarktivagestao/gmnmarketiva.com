@@ -3222,3 +3222,110 @@ input[type="radio"] {
     break-inside: auto;
   }
 }
+
+/* ---------- Link de acompanhamento do cliente ---------- */
+
+/* Página que o cliente abre: sem menu, a folha do relatório sobre fundo claro */
+.publico {
+  min-height: 100vh;
+  padding: 1.5rem 1rem 3rem;
+  background: var(--suave);
+}
+.publico-nota {
+  margin: 0;
+  max-width: 52ch;
+  font-size: 0.86rem;
+  color: var(--tinta-suave);
+}
+.publico-vazio {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-top: 4rem;
+  background: transparent;
+}
+.publico-vazio h1 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.5rem;
+}
+.publico-vazio p {
+  max-width: 52ch;
+  color: var(--tinta-suave);
+}
+.publico-logo {
+  display: inline-block;
+  padding: 0.9rem 1.25rem;
+  border-radius: var(--raio);
+  background: var(--preto);
+}
+
+/* Bloco da equipe, na semana do cliente */
+.link-cliente > p {
+  max-width: 62ch;
+}
+.link-cliente-estado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.6rem;
+  margin: 0 0 0.9rem;
+}
+.link-cliente-linha {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 720px;
+  margin-top: 0.3rem;
+}
+.link-cliente-linha input {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+}
+.link-cliente-linha .btn {
+  flex: none;
+}
+.link-cliente-copiado {
+  min-height: 1.4em;
+  margin: 0.35rem 0 0.25rem;
+  font-size: 0.86rem;
+  color: var(--azul);
+}
+.link-cliente-troca {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 720px;
+  margin-top: 1rem;
+}
+.link-cliente-troca details {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+}
+.link-cliente-troca summary {
+  cursor: pointer;
+  font-weight: 560;
+}
+.link-cliente-troca details p {
+  margin: 0.5rem 0;
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+}
+.link-cliente-nota {
+  color: var(--tinta-suave);
+}
+
+@media (max-width: 720px) {
+  .link-cliente-linha {
+    flex-direction: column;
+  }
+  .link-cliente-linha .btn {
+    width: 100%;
+  }
+}
+
+@media print {
+  .publico {
+    min-height: 0;
+    padding: 0;
+    background: #fff;
+  }
+}

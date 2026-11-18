@@ -78,13 +78,15 @@ A chave `publishable` é feita para ficar no navegador. A proteção dos dados e
 
 ```
 app/                 páginas (painel, pendências, conteúdo, diretrizes, clientes, últimos 7 dias, histórico, novidades, equipe, login)
+app/p/[token]/       página pública do cliente (link secreto, sem login, só leitura): ver docs/link-do-cliente.md
 app/actions.ts       ações do servidor: pendências, diretrizes, serviços, imagens, conteúdo, equipe, entrar/sair
 components/          matriz, prévia do Google, galeria de imagens, serviços, formulários, mapa e dia a dia da semana
 public/              logo da Marktiva (branca: usar sobre o fundo preto)
 lib/dados.ts         leitura do Supabase (ou dos dados de demonstração)
 lib/semana.ts        lógica dos últimos 7 dias (dia no horário de Brasília, grupos de ação, contagens); testada em lib/semana.test.ts
+lib/acompanhamento.ts  link do cliente: formato do token e leitura segura do que o banco devolve; testada em lib/acompanhamento.test.ts
 data/seed.json       dados de demonstração
 docs/                documentos de apoio (texto da seção SISTEMA das rotinas; como registrar mudanças em Novidades)
-proxy.ts             renova a sessão e manda quem não entrou para /login
+proxy.ts             renova a sessão e manda quem não entrou para /login (menos /login, /auth e /p/, que é o link do cliente)
 supabase/            migrações e dados iniciais
 ```

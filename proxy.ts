@@ -21,7 +21,8 @@ export async function proxy(request: NextRequest) {
 
   const { data } = await supabase.auth.getUser();
   const rota = request.nextUrl.pathname;
-  const publica = rota.startsWith("/login") || rota.startsWith("/auth");
+  // /p/ é o link de acompanhamento do cliente: abre sem login, só com o token secreto
+  const publica = rota.startsWith("/login") || rota.startsWith("/auth") || rota.startsWith("/p/");
 
   if (!data.user && !publica) {
     const destino = request.nextUrl.clone();
