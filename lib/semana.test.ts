@@ -2,10 +2,13 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   agruparDiaPorCliente,
+  contarPorGrupo,
   diaChave,
   grupoDoTipo,
   inicioDaBusca,
   montarSemana,
+  paraOCliente,
+  periodoEmTexto,
   quandoFoi,
   resumirPorCliente,
   ultimosDias,
@@ -175,4 +178,49 @@ test("a busca começa um dia antes da janela, para não perder o começo do prim
   const desde = inicioDaBusca(new Date(AGORA));
   assert.equal(desde, "2026-11-10T13:00:00.000Z");
   assert.ok(desde < "2026-11-12T03:00:00Z"); // o primeiro dia da janela é 12/11, que começa às 03:00 UTC
+});
+
+const evRel = (id: string, tipo: string, extra: Partial<{ ok: boolean; origem: string }> = {}) => ({
+  id,
+  cliente_id: "c1" as string | null,
+  tipo,
+  resumo: `Ação ${id}`,
+  detalhe: null,
+  origem: "rotina",
+  ok: true,
+  ocorreu_em: "2026-11-18T05:00:00Z",
+  ...extra,
+});
+
+test("o relatório do cliente tira o que falhou e as anotações internas", () => {
+  const lista = [
+    evRel("1", "post"),
+    evRel("2", "post", { ok: false }),
+    evRel("3", "decisao", { origem: "equipe" }),
+    evRel("4", "analise"),
+    evRel("5", "descricao", { origem: "equipe" }),
+  ];
+  assert.deepEqual(
+    paraOCliente(lista).map((e) => e.id),
+    ["1", "5"],
+  );
+});
+
+test("o período aparece em texto, inclusive na virada de ano", () => {
+  assert.equal(periodoEmTexto(ultimosDias("2026-11-18T13:00:00Z")), "12/11 a 18/11/2026");
+  assert.equal(periodoEmTexto(ultimosDias("2027-01-03T13:00:00Z")), "28/12/2026 a 03/01/2027");
+  assert.equal(periodoEmTexto([]), "");
+});
+
+test("a contagem por tipo traz os seis grupos, mesmo os zerados", () => {
+  const c = contarPorGrupo([evRel("1", "post"), evRel("2", "post"), evRel("3", "foto"), evRel("4", "area")]);
+  assert.equal(c.length, 6);
+  assert.deepEqual(Object.fromEntries(c.map((x) => [x.chave, x.n])), {
+    fotos: 1,
+    servicos: 0,
+    postagens: 2,
+    respostas: 0,
+    perfil: 1,
+    decisoes: 0,
+  });
 });

@@ -1,9 +1,12 @@
+import { headers } from "next/headers";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { DiaADia } from "@/components/DiaADia";
+import { LinkDoCliente } from "@/components/LinkDoCliente";
 import { MapaSemana } from "@/components/MapaSemana";
 import { ResumoSemana } from "@/components/ResumoSemana";
-import { listarClientes, listarEventosDesde } from "@/lib/dados";
+import { lerLinkDoCliente, listarClientes, listarEventosDesde, usuarioAtual } from "@/lib/dados";
 import { JANELA_ROTINA, inicioDaBusca, montarSemana } from "@/lib/semana";
 
 export const metadata: Metadata = { title: "Últimos 7 dias" };
@@ -11,9 +14,14 @@ export const metadata: Metadata = { title: "Últimos 7 dias" };
 export default async function SemanaDoCliente({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const agora = new Date();
-  const [clientes, eventos] = await Promise.all([listarClientes(), listarEventosDesde(inicioDaBusca(agora))]);
+  const [clientes, eventos, usuario] = await Promise.all([listarClientes(), listarEventosDesde(inicioDaBusca(agora)), usuarioAtual()]);
   const cliente = clientes.find((c) => c.slug === slug);
   if (!cliente) notFound();
+  const podeGerir = usuario?.papel === "admin";
+  const link = podeGerir ? await lerLinkDoCliente(cliente.id) : null;
+  const cabecalhos = await headers();
+  const host = cabecalhos.get("x-forwarded-host") ?? cabecalhos.get("host") ?? "localhost:3000";
+  const origem = `${cabecalhos.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https")}://${host}`;
   const semana = montarSemana(
     eventos.filter((e) => e.cliente_id === cliente.id),
     agora,
@@ -25,6 +33,13 @@ export default async function SemanaDoCliente({ params }: { params: Promise<{ sl
         O que a rotina da madrugada ({JANELA_ROTINA}) e a equipe fizeram no perfil de {cliente.nome} nos últimos 7 dias.
       </p>
       <ResumoSemana semana={semana} rotulo={`Resumo dos últimos 7 dias de ${cliente.nome}`} />
+      <p className="semana-acoes">
+        <Link className="link-secao" href={`/relatorio/${cliente.slug}`}>
+          Abrir o relatório para o cliente (imprimir ou salvar em PDF)
+        </Link>
+      </p>
+
+      <LinkDoCliente clienteId={cliente.id} clienteNome={cliente.nome} link={link} origem={origem} podeGerir={podeGerir} />
 
       {semana.total === 0 ? (
         <p className="vazio">Nenhuma ação registrada para este cliente nos últimos 7 dias.</p>

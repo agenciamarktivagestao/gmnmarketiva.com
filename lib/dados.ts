@@ -8,7 +8,10 @@ import { normalizarMudancas } from "./mudancas";
 import { normalizarPerfil } from "./perfil";
 import type { PerfilLido } from "./perfil";
 import { perfilDemonstracao } from "./perfil-demo";
-import { supabaseServidor } from "./supabase";
+import { TOKEN_DEMO, lerRespostaPublica } from "./acompanhamento";
+import type { Acompanhamento, LinkDoCliente } from "./acompanhamento";
+import { paraOCliente } from "./semana";
+import { supabasePublico, supabaseServidor } from "./supabase";
 import type { Cliente, Conteudo, Diagnostico, Diretriz, Evento, Membro, Midia, Mudanca, Pendencia, Servico, Usuario } from "./tipos";
 
 // ---------------------------------------------------------------------------
@@ -275,4 +278,55 @@ export async function listarConteudos(): Promise<Conteudo[]> {
     .order("criado_em", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Conteudo[]) ?? [];
+}
+
+// ---------------------------------------------------------------------------
+// Link de acompanhamento do cliente
+// ---------------------------------------------------------------------------
+
+// O link ativo de um cliente. Só administradores conseguem ler (o token é um segredo); para os outros vem null.
+export async function lerLinkDoCliente(clienteId: string): Promise<LinkDoCliente | null> {
+  if (modoDemonstracao()) {
+    return { token: TOKEN_DEMO, criado_em: new Date(Date.now() - 3 * 86_400_000).toISOString(), acessos: 2, ultimo_acesso: new Date(Date.now() - 86_400_000).toISOString() };
+  }
+  const sb = await supabaseServidor();
+  const { data, error } = await sb
+    .from("acessos_cliente")
+    .select("token,criado_em,acessos,ultimo_acesso")
+    .eq("cliente_id", clienteId)
+    .is("revogado_em", null)
+    .maybeSingle();
+  if (error) {
+    console.error("acessos_cliente:", error.message);
+    return null;
+  }
+  return data as LinkDoCliente | null;
+}
+
+// O que a página pública mostra. Sem login: a pessoa só chega aqui com o token, e o banco só devolve os campos
+// aprovados (ver a migration acessos_cliente). Token errado, desativado ou qualquer falha: null.
+// contar = false na pré-visualização da equipe, para não contar como "o cliente abriu".
+export async function lerAcompanhamento(token: string, contar = true): Promise<Acompanhamento | null> {
+  if (modoDemonstracao()) return token === TOKEN_DEMO ? acompanhamentoDemonstracao() : null;
+  try {
+    const { data, error } = await supabasePublico().rpc("acompanhamento_cliente", { p_token: token, p_contar: contar });
+    if (error) throw new Error(error.message);
+    return lerRespostaPublica(data);
+  } catch (e) {
+    console.error("acompanhamento_cliente:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
+function acompanhamentoDemonstracao(): Acompanhamento | null {
+  const cliente = demoClientes()[0];
+  if (!cliente) return null;
+  const d = demoDiagnosticos().find((x) => x.cliente_id === cliente.id);
+  const eventos = paraOCliente(eventosDemonstracao(new Date()).filter((e) => e.cliente_id === cliente.id)).map((e) => ({ ...e, detalhe: null }));
+  return {
+    cliente: { nome: cliente.nome, categoria: cliente.categoria, cidade: cliente.cidade },
+    eventos,
+    diagnostico: d ? { lido_em: d.lido_em, impressoes: d.impressoes, ligacoes: d.ligacoes, rotas: d.rotas, cliques_site: d.cliques_site } : null,
+    geradoEm: new Date().toISOString(),
+  };
 }

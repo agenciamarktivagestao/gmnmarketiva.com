@@ -1,5 +1,6 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -310,6 +311,45 @@ export async function removerMembro(email: string): Promise<Resultado> {
   const { data, error } = await sb.from("equipe").delete().eq("email", email).select("email");
   if (error) return { erro: error.message };
   if (!data?.length) return { erro: "Só administradores podem remover acessos." };
+  atualizar();
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Link de acompanhamento do cliente (só administradores)
+// ---------------------------------------------------------------------------
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Cria o link do cliente. Se já havia um, ele é desativado na mesma operação (se algo falhar, o antigo continua valendo).
+export async function criarLinkCliente(_: Resultado | null, dados: FormData): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  const cliente = String(dados.get("cliente") ?? "");
+  if (!UUID.test(cliente)) return { erro: "Cliente inválido." };
+  const sb = await supabaseServidor();
+  const token = randomBytes(32).toString("base64url");
+  const { error } = await sb.rpc("criar_link_cliente", { p_cliente: cliente, p_token: token });
+  if (error) {
+    console.error("criar_link_cliente:", error.message);
+    return { erro: "Só administradores podem criar o link. Se você é, tente de novo." };
+  }
+  atualizar();
+  return { ok: true };
+}
+
+export async function desativarLinkCliente(_: Resultado | null, dados: FormData): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  const cliente = String(dados.get("cliente") ?? "");
+  if (!UUID.test(cliente)) return { erro: "Cliente inválido." };
+  const sb = await supabaseServidor();
+  const { data: u } = await sb.auth.getUser();
+  const { data, error } = await sb
+    .from("acessos_cliente")
+    .update({ revogado_em: new Date().toISOString(), revogado_por: u.user?.email?.toLowerCase() ?? null })
+    .eq("cliente_id", cliente)
+    .is("revogado_em", null)
+    .select("id");
+  if (error) return { erro: error.message };
+  if (!data?.length) return { erro: "Não há link ativo para desativar, ou só administradores podem fazer isso." };
   atualizar();
   return { ok: true };
 }
