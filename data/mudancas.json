@@ -1,5 +1,37 @@
 [
   {
+    "feito_em": "2026-11-18T10:58:00-03:00",
+    "titulo": "Últimos 7 dias: o que foi feito, dia a dia e por cliente",
+    "resumo": "Nova tela com o mapa da semana e o dia a dia das ações da rotina e da equipe, no geral e em cada cliente.",
+    "itens": [
+      "Tela Últimos 7 dias no menu: resumo da semana, mapa de ações por tipo e por dia, a semana de cada cliente e o dia a dia agrupado por cliente",
+      "Aba Últimos 7 dias dentro de cada cliente, com o mesmo mapa e dia a dia só dele",
+      "Linha nova no Painel com o total da semana, quanto foi da rotina e da equipe e quantas falharam",
+      "Os dias seguem o horário de Brasília; a tela só lê, não altera nada"
+    ],
+    "como_testar": "Abra Últimos 7 dias no menu: devem aparecer as ações de 16 a 18/11. Toque num dia do mapa para ir ao que foi feito nele e toque num cliente para ver só a semana dele. No celular, confira que nada sai da tela.",
+    "pendente": "Para a rotina gravar sozinha toda noite, falta ligar o Supabase à tarefa agendada.",
+    "tipo": "painel",
+    "commit_sha": "eda7c22",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-18T10:28:40-03:00",
+    "titulo": "Uma só rotina, todas as madrugadas",
+    "resumo": "A rotina agora roda todos os dias, das 02:30 às 04:30, e faz tudo numa passada. A rotina de quarta e sexta ficou pausada.",
+    "itens": [
+      "Na mesma noite: decisões e comentários novos do painel, imagens novas no Drive, avaliações, serviços, postagens e os clientes que estão há mais tempo sem ação",
+      "Meta de 4 a 10 ajustes por noite; perto das 04:15 ela para de começar ações novas",
+      "Cada ação vai para o Histórico em português claro, uma linha por ação e no cliente certo",
+      "Corrigido um erro no banco que impediria o registro da rodada da madrugada"
+    ],
+    "como_testar": "Amanhã de manhã abra Últimos 7 dias: o dia de hoje deve mostrar as ações da noite. No Painel, a linha Últimos 7 dias também sobe.",
+    "pendente": "Ligar o conector do Supabase à tarefa agendada Ajustes diários GBP madrugada, nas configurações dela. Sem isso a rotina trabalha, mas não grava no painel.",
+    "tipo": "rotina",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-18T09:25:49-03:00",
     "titulo": "Rotinas preparadas para ler e gravar no painel",
     "resumo": "As duas rotinas agendadas agora sabem ler o que a equipe decidiu no painel, gravar o que fizeram no Histórico e incluem o Limpa Cano.",
