@@ -162,3 +162,23 @@ export function agruparDiaPorCliente(eventos: Evento[], ordemClientes: string[])
   if (mapa.has(SEM_CLIENTE)) grupos.push({ clienteId: null, eventos: mapa.get(SEM_CLIENTE)! });
   return grupos;
 }
+
+// O relatório que vai para o cliente mostra o trabalho entregue. Ficam de fora o que não deu certo (a rotina tenta de novo
+// e o resultado aparece depois) e as anotações internas: decisões da equipe, análises e o que não tem tipo definido.
+export const TIPOS_INTERNOS = ["decisao", "analise", "outro"];
+
+export const paraOCliente = (eventos: Evento[]): Evento[] => eventos.filter((e) => e.ok && !TIPOS_INTERNOS.includes(e.tipo));
+
+// "12/11 a 18/11/2026" (mesmo ano) ou "28/12/2026 a 03/01/2027" (virada de ano)
+export function periodoEmTexto(dias: Dia[]): string {
+  if (dias.length === 0) return "";
+  const a = dias[0].chave;
+  const b = dias[dias.length - 1].chave;
+  const dm = (c: string) => `${c.slice(8)}/${c.slice(5, 7)}`;
+  return a.slice(0, 4) === b.slice(0, 4) ? `${dm(a)} a ${dm(b)}/${b.slice(0, 4)}` : `${dm(a)}/${a.slice(0, 4)} a ${dm(b)}/${b.slice(0, 4)}`;
+}
+
+// Quantas ações de cada tipo houve (todos os seis grupos aparecem, mesmo com zero)
+export function contarPorGrupo(eventos: Evento[]): { chave: GrupoChave; nome: string; n: number }[] {
+  return GRUPOS.map((g) => ({ chave: g.chave, nome: g.nome, n: eventos.filter((e) => grupoDoTipo(e.tipo) === g.chave).length }));
+}

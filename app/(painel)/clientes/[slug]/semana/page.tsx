@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { DiaADia } from "@/components/DiaADia";
@@ -25,6 +26,11 @@ export default async function SemanaDoCliente({ params }: { params: Promise<{ sl
         O que a rotina da madrugada ({JANELA_ROTINA}) e a equipe fizeram no perfil de {cliente.nome} nos últimos 7 dias.
       </p>
       <ResumoSemana semana={semana} rotulo={`Resumo dos últimos 7 dias de ${cliente.nome}`} />
+      <p className="semana-acoes">
+        <Link className="link-secao" href={`/relatorio/${cliente.slug}`}>
+          Abrir o relatório para o cliente (imprimir ou salvar em PDF)
+        </Link>
+      </p>
 
       {semana.total === 0 ? (
         <p className="vazio">Nenhuma ação registrada para este cliente nos últimos 7 dias.</p>
