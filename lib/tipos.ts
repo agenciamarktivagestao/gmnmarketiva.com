@@ -180,3 +180,29 @@ export type Conteudo = {
   publicado_em: string | null;
   criado_em: string;
 };
+
+// Ajustes da rotina da madrugada (tela Rotina). A rotina lê estas duas tabelas antes de começar.
+export type AjustesRotina = {
+  ativa: boolean;
+  limite_ajustes: number;
+  meta_minima: number;
+  max_postagens: number;
+  responder_avaliacoes: boolean;
+  publicar_postagens: boolean;
+  enviar_fotos: boolean;
+  atualizar_servicos: boolean;
+  atualizado_em: string | null;
+  atualizado_por: string | null;
+};
+
+export type AjustesCliente = {
+  cliente_id: string;
+  pausada: boolean;
+  fotos: boolean;
+  servicos: boolean;
+  postagens: boolean;
+  respostas: boolean;
+  nota: string;
+};
+
+export type Execucao = { id: string; tipo: string; iniciada_em: string; resumo: string | null };

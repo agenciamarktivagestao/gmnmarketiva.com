@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/conteudo", nome: "Conteúdo" },
   { href: "/diretrizes", nome: "Diretrizes" },
   { href: "/semana", nome: "Últimos 7 dias" },
+  { href: "/rotina", nome: "Rotina" },
   { href: "/historico", nome: "Histórico" },
   { href: "/equipe", nome: "Equipe" },
   { href: "/novidades", nome: "Novidades" },

@@ -3,6 +3,7 @@ import { Fase } from "@/components/Fase";
 import { Matriz } from "@/components/Matriz";
 import {
   contarNovidadesNaoVistas,
+  lerAjustesRotina,
   listarClientes,
   listarConteudos,
   listarDiagnosticos,
@@ -35,6 +36,10 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
     listarEventosDesde(inicioDaBusca(agora)),
   ]);
   const semana = montarSemana(eventosDaSemana, agora);
+  // Aviso de rotina pausada: é um complemento, então se a leitura falhar o Painel segue sem ele
+  const rotinaPausada = await lerAjustesRotina()
+    .then((a) => !a.ativa)
+    .catch(() => false);
   const textosEsperam = conteudos.filter((c) => c.status === "rascunho").length;
   const imagensNaFila = midias.filter((m) => m.status === "na_fila").length;
   const servicosEsperam = servicos.filter((s) => s.status === "sugerido").length;
@@ -110,6 +115,12 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
             {novidades === 1 ? "1 novidade no sistema desde a sua última visita." : `${novidades} novidades no sistema desde a sua última visita.`}
           </span>
           <Link href="/novidades">Ver o que mudou</Link>
+        </p>
+      )}
+      {rotinaPausada && (
+        <p className="aviso-novidades">
+          <span>A rotina da madrugada está pausada: ela não altera nenhum perfil até você ligar de novo.</span>
+          <Link href="/rotina">Abrir Rotina</Link>
         </p>
       )}
       <section className="abertura">
