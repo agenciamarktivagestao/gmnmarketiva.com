@@ -1,5 +1,86 @@
 [
   {
+    "feito_em": "2026-11-18T11:30:12-03:00",
+    "titulo": "Alertas de atenção no Painel",
+    "resumo": "O Painel mostra o que pede atenção: rotina sem registro, ações que falharam e clientes sem ação na semana.",
+    "itens": [
+      "Bloco Pede atenção, logo abaixo das decisões",
+      "Aviso quando a rotina não registrou a noite, dizendo desde quando",
+      "Ações que falharam nos últimos 3 dias, com cliente, o que era e quando",
+      "Clientes sem nenhuma ação nos últimos 7 dias (cliente pausado em Rotina não entra)"
+    ],
+    "como_testar": "Abra o Painel e veja o bloco Pede atenção. Pause um cliente em Rotina e confira que ele sai da lista.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "a63c5f5",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-18T11:29:12-03:00",
+    "titulo": "Link de acompanhamento do cliente",
+    "resumo": "O cliente pode acompanhar a própria semana por um link secreto, sem senha e só para ler.",
+    "itens": [
+      "Bloco Link para o cliente acompanhar na semana de cada cliente, só para administradores",
+      "Criar, copiar, abrir como o cliente vê, gerar um novo link e desativar",
+      "A página pública mostra só o que deu certo e os números do perfil, nada interno",
+      "Nada fica público até um administrador criar o link"
+    ],
+    "como_testar": "Entre como administrador, abra Últimos 7 dias de um cliente e crie o link. Abra numa janela anônima. Depois desative e confira que o link deixa de abrir.",
+    "pendente": "Falta testar o fluxo completo com um administrador logado e criar o primeiro link.",
+    "tipo": "painel",
+    "commit_sha": "09e0a2b",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-18T11:28:12-03:00",
+    "titulo": "Relatório semanal para o cliente",
+    "resumo": "Cada cliente tem uma folha A4 com o que a equipe fez na semana e os números do perfil no Google.",
+    "itens": [
+      "Nova página do relatório, aberta pela semana de cada cliente",
+      "Só entra o que deu certo: falhas e anotações internas ficam de fora",
+      "Cabe em uma folha A4, com botão para imprimir ou salvar em PDF"
+    ],
+    "como_testar": "Abra um cliente, entre em Últimos 7 dias e toque em Abrir o relatório para o cliente.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "96548cc",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-18T11:27:12-03:00",
+    "titulo": "Tela Rotina: você decide o que a rotina pode fazer",
+    "resumo": "Nova tela para ligar ou pausar a rotina e definir limites e tipos de ação, geral e por cliente.",
+    "itens": [
+      "Ligar ou pausar a rotina da madrugada",
+      "Mínimo e limite de ajustes e máximo de postagens por noite",
+      "Ligar ou desligar respostas a avaliações, postagens, fotos e serviços",
+      "Por cliente: pausar, bloquear um tipo de ação e deixar um recado para a rotina",
+      "Últimas rodadas da rotina na própria tela",
+      "O Painel avisa quando a rotina está pausada"
+    ],
+    "como_testar": "Abra Rotina no menu, mude o limite de ajustes e salve. Depois, em um cliente, marque Pausar este cliente e recarregue a página.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "ffbb66e",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-18T11:06:00-03:00",
+    "titulo": "A rotina da madrugada passou a ler os ajustes do painel",
+    "resumo": "A rotina agendada agora consulta a tela Rotina antes de agir. Sem ajustes, ela faz tudo como antes.",
+    "itens": [
+      "Nova seção Ajustes do painel no texto da rotina",
+      "Rotina pausada não escreve em nenhum perfil do Google",
+      "Limites de ajustes, de postagens e tipos de ação desligados são respeitados, por cliente também",
+      "Os ajustes só restringem: os limites de segurança da rotina continuam valendo"
+    ],
+    "como_testar": "Pause um cliente em Rotina. No relatório da noite seguinte, a rotina deve dizer que ele foi segurado pelo painel.",
+    "pendente": "A rotina só grava no painel quando o conector do Supabase estiver ligado na tarefa agendada.",
+    "tipo": "rotina",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-18T10:58:00-03:00",
     "titulo": "Últimos 7 dias: o que foi feito, dia a dia e por cliente",
     "resumo": "Nova tela com o mapa da semana e o dia a dia das ações da rotina e da equipe, no geral e em cada cliente.",
