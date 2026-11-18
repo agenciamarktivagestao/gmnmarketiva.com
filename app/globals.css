@@ -3185,3 +3185,79 @@ input[type="radio"] {
     gap: 0.1rem;
   }
 }
+
+/* ---------- Painel: o que pede atenção ---------- */
+
+.atencao {
+  margin: 0 0 1.75rem;
+}
+.atencao h2 {
+  margin-bottom: 0.6rem;
+}
+.atencao-lista {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.atencao-lista > li {
+  padding: 0.7rem 0.95rem;
+  border: 1px solid var(--linha);
+  border-left-width: 4px;
+  border-radius: var(--raio);
+  background: var(--papel);
+}
+/* Dois níveis, sem depender só de cor: o mais grave tem contorno preto e título em negrito */
+.atencao-alto {
+  border-color: var(--preto) !important;
+}
+.atencao-alto .atencao-titulo {
+  font-weight: 700;
+}
+.atencao-medio {
+  border-left-color: var(--azul) !important;
+}
+.atencao-titulo {
+  margin: 0;
+  font-weight: 600;
+}
+.atencao-detalhe {
+  margin: 0.25rem 0 0;
+  max-width: 68ch;
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+}
+.atencao-detalhe a,
+.atencao-itens a,
+.atencao-nomes a {
+  color: var(--azul-escuro);
+  font-weight: 560;
+}
+.atencao-itens {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+.atencao-itens li + li {
+  margin-top: 0.2rem;
+}
+.atencao-quando {
+  color: var(--tinta-suave);
+  white-space: nowrap;
+}
+.atencao-nomes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+}
+.atencao-ok {
+  margin: 0 0 1.5rem;
+  max-width: 68ch;
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+}
