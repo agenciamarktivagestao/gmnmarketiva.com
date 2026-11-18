@@ -1,5 +1,56 @@
 [
   {
+    "feito_em": "2026-11-18T09:25:49-03:00",
+    "titulo": "Rotinas preparadas para ler e gravar no painel",
+    "resumo": "As duas rotinas agendadas agora sabem ler o que a equipe decidiu no painel, gravar o que fizeram no Histórico e incluem o Limpa Cano.",
+    "itens": [
+      "Rotina da madrugada: nova seção que lê pendências, serviços, fotos e textos aprovados e grava o resultado no painel",
+      "Rotina de quarta e sexta: a mesma seção, com o tipo de execução próprio",
+      "As duas passam a gravar a prévia de cada perfil e o histórico de cada ação",
+      "Limpa Cano incluído nas duas (perfil, regras de texto e postagens da madrugada)",
+      "Avaliação de 1 estrela da Clínica Dentária segue segurada até a equipe decidir",
+      "Cada rotina avisa a outra pelo log, para não repetir ação"
+    ],
+    "como_testar": "Depois da próxima rodada (madrugada de quinta ou sexta de manhã), abra Histórico no painel: devem aparecer linhas novas com origem Rotina. Em Painel, a data da última execução também muda.",
+    "pendente": "Falta ligar o conector do Supabase em cada rotina, direto nas configurações das tarefas agendadas. Sem isso, as rotinas seguem como antes (só pelo log do Drive) e avisam no relatório.",
+    "tipo": "rotina",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-18T09:19:55-03:00",
+    "titulo": "Limpa Cano: descrição e categorias atualizadas no Google",
+    "resumo": "A descrição do Limpa Cano foi reescrita e as categorias foram ajustadas, com a sua aprovação.",
+    "itens": [
+      "Descrição nova: corrige o erro \"Londina\" e cita os serviços e as cidades atendidas (479 caracteres)",
+      "Categoria \"Limpeza\" removida, porque trazia serviços de faxina que o cliente não faz",
+      "Categoria \"Dedetizadora\" adicionada, e o serviço Dedetização passou para ela",
+      "Principal continua Desentupidora, e Encanador e Serviço de reparos hidráulicos foram mantidas",
+      "Tudo conferido lendo o perfil de volta; as 3 ações ficaram registradas no Histórico do cliente"
+    ],
+    "como_testar": "Abra Limpa Cano > Histórico no painel. No Google, veja a descrição e as categorias do perfil.",
+    "pendente": "O Google pode revisar mudanças de categoria por alguns dias. O perfil parece não estar verificado (o Google não devolve avaliações dele): vale confirmar com o cliente.",
+    "tipo": "dados",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-18T09:18:55-03:00",
+    "titulo": "Painel simplificado e Novidades no ar",
+    "resumo": "O painel que estava no ar desde ontem agora é o mesmo código da main, e a página Novidades, com o selo e o aviso no topo do Painel, passou a funcionar em produção.",
+    "itens": [
+      "Painel com a lista de clientes, o que falta em cada um e as decisões que esperam por você",
+      "Página Novidades no menu, com o selo azul de não lidas e o aviso no topo do Painel",
+      "A main do GitHub e o endereço em produção agora mostram a mesma versão, então um novo envio para a main não volta o painel para a versão antiga",
+      "Conferido: a produção respondeu sem erros de execução"
+    ],
+    "como_testar": "Entre no painel: o menu deve ter Novidades com o selo azul, e o Painel deve mostrar o aviso no topo. Abra Novidades e veja o selo sumir.",
+    "pendente": null,
+    "tipo": "painel",
+    "commit_sha": "8e01001",
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-17T18:19:13-03:00",
     "titulo": "Serviços do Limpa Cano publicados no Google",
     "resumo": "Os 15 serviços que você aprovou já estão no perfil do Limpa Cano no Google, e eu conferi lendo o perfil de volta.",
