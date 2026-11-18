@@ -1,6 +1,6 @@
 # Seção SISTEMA para as rotinas
 
-Texto para acrescentar ao prompt das duas rotinas (madrugada e quarta e sexta), logo antes dos LIMITES. Ele faz a rotina ler do painel o que a equipe decidiu e gravar de volta o que fez. Exige o conector **Supabase** ligado à rotina (projeto `zfvutyhrehmwhzyfbfbv`). Sem o conector, a rotina segue o comportamento antigo e avisa no relatório.
+Texto para acrescentar ao prompt da rotina, logo antes dos LIMITES. Hoje existe uma só rotina ativa: roda todos os dias de madrugada, das 02:30 às 04:30, e faz tudo numa passada (comentários e decisões novas, imagens novas no Drive, ajustes nos perfis e os clientes que estão há mais tempo sem atenção). A rotina de quarta e sexta ficou pausada; o texto abaixo vale para qualquer uma das duas. Ele faz a rotina ler do painel o que a equipe decidiu e gravar de volta o que fez. Exige o conector **Supabase** ligado à rotina (projeto `zfvutyhrehmwhzyfbfbv`). Sem o conector, a rotina segue o comportamento antigo e avisa no relatório.
 
 Os LIMITES de cada rotina continuam valendo acima de qualquer diretriz do painel.
 
@@ -34,13 +34,13 @@ PRÉVIA DO PERFIL (para a página de cada cliente no painel)
 - Cada pendência aparece na parte do perfil a que se refere. O painel descobre a parte pelo título; para não depender disso, grave payload.secao com uma destas chaves: fotos, nome, descricao, servicos, horario, area, atributos, avaliacoes, posts ou outras.
 
 REGISTRO no fim:
-- insert into execucoes (tipo, resumo) values ('madrugada' ou 'quarta_sexta', '<resumo curto>') returning id.
-- Para cada ação, insert into historico (cliente_id, execucao_id, tipo, resumo, detalhe, origem, ok) com tipo em foto, servico, categoria, resposta, post, area, descricao, analise ou outro; origem = 'rotina'; ok = false quando falhou.
+- insert into execucoes (tipo, resumo) values ('madrugada', '<resumo curto>') returning id.
+- Para cada ação, insert into historico (cliente_id, execucao_id, tipo, resumo, detalhe, origem, ok) com tipo em foto, servico, categoria, resposta, post, area, descricao, analise ou outro; origem = 'rotina'; ok = false quando falhou. O resumo e o detalhe de cada ação vão em português simples, sem sigla nem termo técnico: eles aparecem na tela Últimos 7 dias, que também é o que a Marktiva mostra ao cliente. Grave uma linha por ação e use sempre o cliente_id do perfil afetado (só use cliente_id nulo para o que vale para todos).
 - Continue gravando o log do Drive como antes: o painel é o centro de controle, o log do Drive segue como cópia.
 ```
 
 ## Como ligar
 
-1. No Claude, abra cada rotina e, em conectores, ligue o **Supabase**. As duas rotinas hoje foram criadas sem ele.
+1. No Claude, abra a rotina e, em conectores, ligue o **Supabase**. Ela foi criada sem ele.
 2. Peça para atualizar as rotinas com este texto.
-3. Confira na rodada seguinte: o painel mostra as linhas novas em **Histórico**, e imagens, serviços e conteúdo aprovados mudam de situação.
+3. Confira na rodada seguinte: o painel mostra as linhas novas em **Últimos 7 dias** (mapa da semana e dia a dia, geral e por cliente) e em **Histórico**, e imagens, serviços e conteúdo aprovados mudam de situação.

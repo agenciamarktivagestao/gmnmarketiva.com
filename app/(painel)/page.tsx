@@ -7,12 +7,14 @@ import {
   listarConteudos,
   listarDiagnosticos,
   listarDiretrizes,
+  listarEventosDesde,
   listarMidias,
   listarPendencias,
   listarServicos,
   usuarioAtual,
 } from "@/lib/dados";
 import { CAMPOS, dataCurta, estaAberta } from "@/lib/rotulos";
+import { inicioDaBusca, montarSemana } from "@/lib/semana";
 
 const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
 
@@ -21,7 +23,8 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
   const porNome = busca.ordem === "nome";
   const usuario = await usuarioAtual();
   const novidades = usuario ? await contarNovidadesNaoVistas(usuario.email) : 0;
-  const [clientes, diagnosticos, pendencias, conteudos, midias, servicos, diretrizes] = await Promise.all([
+  const agora = new Date();
+  const [clientes, diagnosticos, pendencias, conteudos, midias, servicos, diretrizes, eventosDaSemana] = await Promise.all([
     listarClientes(),
     listarDiagnosticos(),
     listarPendencias(),
@@ -29,7 +32,9 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
     listarMidias(),
     listarServicos(),
     listarDiretrizes(),
+    listarEventosDesde(inicioDaBusca(agora)),
   ]);
+  const semana = montarSemana(eventosDaSemana, agora);
   const textosEsperam = conteudos.filter((c) => c.status === "rascunho").length;
   const imagensNaFila = midias.filter((m) => m.status === "na_fila").length;
   const servicosEsperam = servicos.filter((s) => s.status === "sugerido").length;
@@ -148,6 +153,21 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
           })}
         </p>
       )}
+
+      <p className="tambem-esperam">
+        <span>Últimos 7 dias:</span>
+        {semana.total === 0 ? (
+          <span>nenhuma ação registrada ainda.</span>
+        ) : (
+          <>
+            <span>
+              {plural(semana.total, "ação registrada", "ações registradas")} ({semana.daRotina} da rotina, {semana.daEquipe} da equipe)
+            </span>
+            {semana.falhas > 0 && <span>{plural(semana.falhas, "falhou", "falharam")}</span>}
+          </>
+        )}
+        <Link href="/semana">Ver o que foi feito</Link>
+      </p>
 
       <section aria-labelledby="t-clientes">
         <div className="secao-topo">

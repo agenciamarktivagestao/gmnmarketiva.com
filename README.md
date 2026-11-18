@@ -77,11 +77,12 @@ A chave `publishable` é feita para ficar no navegador. A proteção dos dados e
 ## Estrutura
 
 ```
-app/                 páginas (painel, pendências, conteúdo, diretrizes, clientes, histórico, novidades, equipe, login)
+app/                 páginas (painel, pendências, conteúdo, diretrizes, clientes, últimos 7 dias, histórico, novidades, equipe, login)
 app/actions.ts       ações do servidor: pendências, diretrizes, serviços, imagens, conteúdo, equipe, entrar/sair
-components/          matriz, prévia do Google, galeria de imagens, serviços, formulários
+components/          matriz, prévia do Google, galeria de imagens, serviços, formulários, mapa e dia a dia da semana
 public/              logo da Marktiva (branca: usar sobre o fundo preto)
 lib/dados.ts         leitura do Supabase (ou dos dados de demonstração)
+lib/semana.ts        lógica dos últimos 7 dias (dia no horário de Brasília, grupos de ação, contagens); testada em lib/semana.test.ts
 data/seed.json       dados de demonstração
 docs/                documentos de apoio (texto da seção SISTEMA das rotinas; como registrar mudanças em Novidades)
 proxy.ts             renova a sessão e manda quem não entrou para /login

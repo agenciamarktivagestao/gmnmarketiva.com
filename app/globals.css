@@ -2702,3 +2702,323 @@ input[type="radio"] {
   }
 }
 
+
+/* ---------- Últimos 7 dias ---------- */
+
+.semana-resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 0.75rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+.semana-resumo > div {
+  display: flex;
+  flex-direction: column-reverse; /* o número aparece em cima, mas o rótulo vem antes no texto lido */
+  justify-content: flex-end;
+  gap: 0.25rem;
+  padding: 1rem 1.1rem;
+  border-left: 1px solid var(--linha);
+}
+.semana-resumo > div:first-child {
+  border-left: 0;
+}
+.semana-resumo dd {
+  margin: 0;
+  font-size: 2.1rem;
+  font-weight: 700;
+  font-stretch: 82%;
+  line-height: 1;
+  color: var(--tinta);
+}
+.semana-resumo dt {
+  font-size: 0.84rem;
+  color: var(--tinta-suave);
+}
+.semana-resumo-alerta {
+  background: var(--erro-fundo);
+}
+.semana-resumo-alerta dd {
+  color: var(--erro);
+}
+.semana-ultima {
+  margin: 0 0 2.25rem;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+.semana-intro {
+  margin: 0 0 1rem;
+}
+.semana-bloco {
+  margin-bottom: 2.5rem;
+}
+
+/* Mapa: tipos de ação nas linhas, dias nas colunas */
+.mapa {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.mapa th,
+.mapa td {
+  padding: 0.4rem 0.15rem;
+  text-align: center;
+  border-bottom: 1px solid var(--linha);
+}
+.mapa thead th:first-child {
+  width: 11rem;
+}
+.mapa tbody th,
+.mapa tfoot th {
+  padding-left: 0;
+  padding-right: 0.5rem;
+  text-align: left;
+  font-weight: 560;
+  overflow-wrap: anywhere;
+}
+.mapa thead th {
+  padding-bottom: 0.3rem;
+}
+.mapa thead a {
+  display: grid;
+  justify-items: center;
+  padding: 0.25rem 0;
+  border-radius: var(--raio);
+  text-decoration: none;
+  color: var(--tinta-suave);
+}
+.mapa thead a:hover {
+  background: var(--azul-claro);
+}
+.mapa-dia {
+  font-size: 0.8rem;
+}
+.mapa-num {
+  font-size: 1.1rem;
+  font-weight: 650;
+  color: var(--tinta);
+}
+.mapa-hoje {
+  background: var(--suave);
+}
+.mapa thead .mapa-hoje .mapa-num {
+  color: var(--azul);
+}
+.mapa tfoot th,
+.mapa tfoot td {
+  border-top: 1px solid var(--linha-forte);
+  border-bottom: 0;
+}
+.mapa-zero {
+  color: var(--linha-forte);
+}
+.mapa-n {
+  display: inline-grid;
+  grid-auto-flow: column;
+  place-items: center;
+  gap: 0.1rem;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.35rem;
+  border-radius: var(--raio);
+  font-weight: 650;
+}
+.mapa-n-1 {
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
+}
+.mapa-n-2 {
+  background: var(--azul-borda);
+  color: var(--azul-escuro);
+}
+.mapa-n-3 {
+  background: var(--azul);
+  color: #fff;
+}
+.mapa-n-falha {
+  box-shadow: 0 0 0 2px var(--preto);
+}
+
+/* Faixa de 7 dias de um cliente */
+.faixa {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.faixa li {
+  display: grid;
+  justify-items: center;
+  width: 2.1rem;
+  padding: 0.25rem 0;
+  border-radius: var(--raio);
+  background: var(--suave);
+  color: var(--tinta-suave);
+  line-height: 1.2;
+}
+.faixa-tem {
+  background: var(--azul-claro) !important;
+  color: var(--azul-escuro) !important;
+}
+.faixa-dia {
+  font-size: 0.72rem;
+}
+.faixa strong {
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+/* Cada cliente */
+.semana-clientes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--linha);
+}
+.semana-cliente-linha {
+  display: grid;
+  grid-template-columns: minmax(10rem, 15rem) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.8rem 0.9rem;
+  border-bottom: 1px solid var(--linha);
+  text-decoration: none;
+  color: inherit;
+}
+.semana-cliente-linha:hover {
+  background: var(--suave);
+}
+.semana-cliente-nome {
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+.semana-cliente-conta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.6rem;
+  font-size: 0.86rem;
+  color: var(--tinta-suave);
+}
+.semana-cliente-conta strong {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-stretch: 82%;
+  line-height: 1;
+  color: var(--tinta);
+}
+.semana-falhas {
+  padding: 0 0.5rem;
+  border: 1px solid var(--preto);
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 650;
+  color: var(--preto);
+}
+
+/* Dia a dia: dia, depois cliente, depois as ações dele */
+.semana-dia {
+  scroll-margin-top: 1rem;
+  margin-bottom: 2.25rem;
+}
+.semana-dia h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 1rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 2px solid var(--preto);
+}
+.semana-dia-conta {
+  font-size: 0.82rem;
+  font-weight: 450;
+  color: var(--tinta-suave);
+}
+.semana-dia-vazio {
+  padding: 0.6rem 0;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+.semana-arvore {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.semana-arvore > li {
+  padding-left: 1rem;
+  border-left: 3px solid var(--azul-borda);
+}
+.semana-cliente {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.8rem;
+  font-size: 1.02rem;
+  font-weight: 650;
+}
+.semana-cliente a {
+  color: var(--azul);
+}
+.semana-dia .eventos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.etiqueta-origem {
+  border-color: var(--azul-borda);
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
+}
+
+@media (max-width: 720px) {
+  .semana-resumo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .semana-resumo > div:nth-child(3) {
+    border-left: 0;
+  }
+  .semana-resumo > div:nth-child(n + 3) {
+    border-top: 1px solid var(--linha);
+  }
+  .semana-resumo dd {
+    font-size: 1.8rem;
+  }
+  .mapa thead th:first-child {
+    width: 5.6rem;
+  }
+  .mapa tbody th,
+  .mapa tfoot th {
+    padding-right: 0.3rem;
+    font-size: 0.8rem;
+    line-height: 1.25;
+  }
+  .mapa-n {
+    min-width: 1.75rem;
+    height: 1.75rem;
+    padding: 0 0.2rem;
+    font-size: 0.85rem;
+  }
+  .semana-cliente-linha {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.45rem;
+    padding: 0.9rem 0.25rem;
+  }
+  .semana-arvore > li {
+    padding-left: 0.75rem;
+  }
+}
+.semana-bloco h2 {
+  margin-bottom: 0.75rem;
+}
+.mapa-legenda {
+  margin-top: 0.6rem;
+  max-width: 62ch;
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+}

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { cache } from "react";
 import { modoDemonstracao } from "./ambiente";
+import { eventosDemonstracao } from "./historico-demo";
 import { kindDemonstracao } from "./kinds";
 import { normalizarMudancas } from "./mudancas";
 import { normalizarPerfil } from "./perfil";
@@ -142,6 +143,26 @@ export async function listarHistorico(limite = 300): Promise<Evento[]> {
   if (error) throw new Error(error.message);
   return data ?? [];
 }
+
+// Tudo o que foi registrado desde uma data (para a visão "Últimos 7 dias"). É um complemento:
+// se a leitura falhar, as páginas continuam e mostram a semana vazia em vez de quebrar.
+export const listarEventosDesde = cache(async (desdeISO: string, limite = 3000): Promise<Evento[]> => {
+  if (modoDemonstracao()) return eventosDemonstracao(new Date()).filter((e) => e.ocorreu_em >= desdeISO);
+  try {
+    const sb = await supabaseServidor();
+    const { data, error } = await sb
+      .from("historico")
+      .select("id,cliente_id,tipo,resumo,detalhe,origem,ok,ocorreu_em")
+      .gte("ocorreu_em", desdeISO)
+      .order("ocorreu_em", { ascending: false })
+      .limit(limite);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  } catch (e) {
+    console.error("historico da semana:", e instanceof Error ? e.message : e);
+    return [];
+  }
+});
 
 export async function listarEquipe(): Promise<Membro[]> {
   if (modoDemonstracao()) return [{ email: "demonstracao@marktiva", nome: "Modo demonstração", papel: "admin" }];
