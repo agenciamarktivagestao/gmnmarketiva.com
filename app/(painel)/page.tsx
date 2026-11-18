@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { Atencao } from "@/components/Atencao";
 import { Fase } from "@/components/Fase";
 import { Matriz } from "@/components/Matriz";
 import {
   contarNovidadesNaoVistas,
+  lerAjustesRotina,
+  listarAjustesClientes,
   listarClientes,
   listarConteudos,
   listarDiagnosticos,
@@ -14,7 +17,8 @@ import {
   usuarioAtual,
 } from "@/lib/dados";
 import { CAMPOS, dataCurta, estaAberta } from "@/lib/rotulos";
-import { inicioDaBusca, montarSemana } from "@/lib/semana";
+import { HORA_LIMITE_DA_ROTINA, calcularAtencao } from "@/lib/alertas";
+import { FUSO, inicioDaBusca, montarSemana } from "@/lib/semana";
 
 const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
 
@@ -35,6 +39,17 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
     listarEventosDesde(inicioDaBusca(agora)),
   ]);
   const semana = montarSemana(eventosDaSemana, agora);
+  // Ajustes da rotina (aviso de rotina pausada e clientes pausados): é um complemento, então se a leitura falhar o Painel segue sem eles
+  const [ajustes, ajustesClientes] = await Promise.all([lerAjustesRotina().catch(() => null), listarAjustesClientes().catch(() => [])]);
+  const rotinaPausada = ajustes ? !ajustes.ativa : false;
+  const horaEmBrasilia = Number(new Intl.DateTimeFormat("en-GB", { timeZone: FUSO, hour: "2-digit", hourCycle: "h23" }).format(agora));
+  const atencao = calcularAtencao({
+    semana,
+    clienteIds: clientes.map((c) => c.id),
+    pausados: new Set(ajustesClientes.filter((a) => a.pausada).map((a) => a.cliente_id)),
+    rotinaAtiva: !rotinaPausada,
+    passouDoPrazo: horaEmBrasilia >= HORA_LIMITE_DA_ROTINA,
+  });
   const textosEsperam = conteudos.filter((c) => c.status === "rascunho").length;
   const imagensNaFila = midias.filter((m) => m.status === "na_fila").length;
   const servicosEsperam = servicos.filter((s) => s.status === "sugerido").length;
@@ -112,6 +127,12 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
           <Link href="/novidades">Ver o que mudou</Link>
         </p>
       )}
+      {rotinaPausada && (
+        <p className="aviso-novidades">
+          <span>A rotina da madrugada está pausada: ela não altera nenhum perfil até você ligar de novo.</span>
+          <Link href="/rotina">Abrir Rotina</Link>
+        </p>
+      )}
       <section className="abertura">
         <h1>
           {esperam.length === 0
@@ -137,6 +158,8 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
           </p>
         )}
       </section>
+
+      {!rotinaPausada && <Atencao atencao={atencao} clientes={clientes} dias={semana.dias} />}
 
       {resumoVisivel.length > 0 && (
         <p className="tambem-esperam">

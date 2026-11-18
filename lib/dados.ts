@@ -6,13 +6,29 @@ import { eventosDemonstracao } from "./historico-demo";
 import { kindDemonstracao } from "./kinds";
 import { normalizarMudancas } from "./mudancas";
 import { normalizarPerfil } from "./perfil";
+import { AJUSTES_PADRAO, normalizarAjustes } from "./rotina";
 import type { PerfilLido } from "./perfil";
 import { perfilDemonstracao } from "./perfil-demo";
 import { TOKEN_DEMO, lerRespostaPublica } from "./acompanhamento";
 import type { Acompanhamento, LinkDoCliente } from "./acompanhamento";
 import { paraOCliente } from "./semana";
 import { supabasePublico, supabaseServidor } from "./supabase";
-import type { Cliente, Conteudo, Diagnostico, Diretriz, Evento, Membro, Midia, Mudanca, Pendencia, Servico, Usuario } from "./tipos";
+import type {
+  AjustesCliente,
+  AjustesRotina,
+  Cliente,
+  Conteudo,
+  Diagnostico,
+  Diretriz,
+  Evento,
+  Execucao,
+  Membro,
+  Midia,
+  Mudanca,
+  Pendencia,
+  Servico,
+  Usuario,
+} from "./tipos";
 
 // ---------------------------------------------------------------------------
 // Modo demonstração: dados da leitura de 16/11/2026, só em memória
@@ -330,3 +346,36 @@ function acompanhamentoDemonstracao(): Acompanhamento | null {
     geradoEm: new Date().toISOString(),
   };
 }
+
+// ---------------------------------------------------------------------------
+// Ajustes da rotina (tela Rotina)
+// ---------------------------------------------------------------------------
+export const lerAjustesRotina = cache(async (): Promise<AjustesRotina> => {
+  if (modoDemonstracao()) return AJUSTES_PADRAO;
+  const sb = await supabaseServidor();
+  const { data, error } = await sb.from("rotina_ajustes").select("*").eq("id", 1).maybeSingle();
+  if (error) throw new Error(error.message);
+  return normalizarAjustes(data);
+});
+
+export const listarAjustesClientes = cache(async (): Promise<AjustesCliente[]> => {
+  if (modoDemonstracao()) return [];
+  const sb = await supabaseServidor();
+  const { data, error } = await sb.from("rotina_clientes").select("cliente_id,pausada,fotos,servicos,postagens,respostas,nota");
+  if (error) throw new Error(error.message);
+  return (data as AjustesCliente[]) ?? [];
+});
+
+// As últimas rodadas da rotina. É um complemento: se a leitura falhar, a tela continua sem a lista.
+export const listarExecucoes = cache(async (limite = 7): Promise<Execucao[]> => {
+  if (modoDemonstracao()) return [];
+  try {
+    const sb = await supabaseServidor();
+    const { data, error } = await sb.from("execucoes").select("id,tipo,iniciada_em,resumo").order("iniciada_em", { ascending: false }).limit(limite);
+    if (error) throw new Error(error.message);
+    return (data as Execucao[]) ?? [];
+  } catch (e) {
+    console.error("execucoes:", e instanceof Error ? e.message : e);
+    return [];
+  }
+});

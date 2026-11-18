@@ -8,6 +8,7 @@ import { modoDemonstracao } from "@/lib/ambiente";
 import { supabaseServidor } from "@/lib/supabase";
 import type { Resultado } from "@/lib/acoes-tipos";
 import { conferirEntrada, conferirEscolha, type Conferida, type Resposta } from "@/lib/respostas";
+import { conferirNumeros, eClientePadrao } from "@/lib/rotina";
 import type { PayloadApprove, PayloadChoose, PayloadInput } from "@/lib/tipos";
 
 const DEMO: Resultado = { erro: "Modo demonstração: conecte o Supabase para salvar." };
@@ -569,6 +570,69 @@ export async function apagarConteudo(id: string): Promise<Resultado> {
   const { data, error } = await sb.from("conteudos").delete().eq("id", id).neq("status", "publicado").select("id");
   if (error) return { erro: error.message };
   if (!data?.length) return { erro: "Este conteúdo não pode ser apagado." };
+  atualizar();
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Rotina: o que a rotina da madrugada pode fazer (ela lê estas tabelas antes de começar)
+// ---------------------------------------------------------------------------
+const marcado = (d: FormData, nome: string) => d.get(nome) === "on";
+
+export async function salvarAjustesGerais(_: Resultado | null, dados: FormData): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  const erro = conferirNumeros({
+    limite_ajustes: dados.get("limite_ajustes"),
+    meta_minima: dados.get("meta_minima"),
+    max_postagens: dados.get("max_postagens"),
+  });
+  if (erro) return { erro };
+  const sb = await supabaseServidor();
+  const { data, error } = await sb
+    .from("rotina_ajustes")
+    .update({
+      ativa: marcado(dados, "ativa"),
+      limite_ajustes: Number(dados.get("limite_ajustes")),
+      meta_minima: Number(dados.get("meta_minima")),
+      max_postagens: Number(dados.get("max_postagens")),
+      responder_avaliacoes: marcado(dados, "responder_avaliacoes"),
+      publicar_postagens: marcado(dados, "publicar_postagens"),
+      enviar_fotos: marcado(dados, "enviar_fotos"),
+      atualizar_servicos: marcado(dados, "atualizar_servicos"),
+    })
+    .eq("id", 1)
+    .select("id");
+  if (error) return { erro: error.message };
+  if (!data?.length) return { erro: "Só administradores podem mudar os ajustes gerais da rotina." };
+  atualizar();
+  return { ok: true };
+}
+
+// Cada cliente que continua com tudo liberado e sem recado perde a linha: sem linha = tudo liberado.
+export async function salvarAjustesClientes(_: Resultado | null, dados: FormData): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  const ids = [...new Set(dados.getAll("cliente").map(String))].filter((id) => UUID.test(id));
+  if (ids.length === 0) return { erro: "Nenhum cliente para salvar." };
+  const linhas = ids.map((id) => ({
+    cliente_id: id,
+    pausada: marcado(dados, `pausada:${id}`),
+    fotos: marcado(dados, `fotos:${id}`),
+    servicos: marcado(dados, `servicos:${id}`),
+    postagens: marcado(dados, `postagens:${id}`),
+    respostas: marcado(dados, `respostas:${id}`),
+    nota: campo(dados, `nota:${id}`, 300),
+  }));
+  const mudados = linhas.filter((l) => !eClientePadrao(l));
+  const liberados = linhas.filter((l) => eClientePadrao(l)).map((l) => l.cliente_id);
+  const sb = await supabaseServidor();
+  if (mudados.length > 0) {
+    const { error } = await sb.from("rotina_clientes").upsert(mudados, { onConflict: "cliente_id" });
+    if (error) return { erro: "Sem permissão para salvar: " + error.message };
+  }
+  if (liberados.length > 0) {
+    const { error } = await sb.from("rotina_clientes").delete().in("cliente_id", liberados);
+    if (error) return { erro: "Sem permissão para salvar: " + error.message };
+  }
   atualizar();
   return { ok: true };
 }

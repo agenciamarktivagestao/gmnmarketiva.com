@@ -85,6 +85,7 @@ public/              logo da Marktiva (branca: usar sobre o fundo preto)
 lib/dados.ts         leitura do Supabase (ou dos dados de demonstração)
 lib/semana.ts        lógica dos últimos 7 dias (dia no horário de Brasília, grupos de ação, contagens); testada em lib/semana.test.ts
 lib/acompanhamento.ts  link do cliente: formato do token e leitura segura do que o banco devolve; testada em lib/acompanhamento.test.ts
+lib/alertas.ts       o que pede atenção no Painel (rotina sem registro, falhas, clientes sem ação); testada em lib/alertas.test.ts
 data/seed.json       dados de demonstração
 docs/                documentos de apoio (texto da seção SISTEMA das rotinas; como registrar mudanças em Novidades)
 proxy.ts             renova a sessão e manda quem não entrou para /login (menos /login, /auth e /p/, que é o link do cliente)
