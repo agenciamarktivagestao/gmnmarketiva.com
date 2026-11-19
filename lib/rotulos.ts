@@ -41,6 +41,7 @@ export const TIPO_EVENTO: Record<string, string> = {
   post: "Postagem",
   area: "Área de atendimento",
   descricao: "Descrição",
+  atributo: "Atributos",
   analise: "Análise",
   decisao: "Decisão",
   outro: "Outro",

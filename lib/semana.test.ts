@@ -70,6 +70,7 @@ test("cada tipo do histórico cai em um grupo, e o desconhecido vai para decisõ
   assert.equal(grupoDoTipo("area"), "perfil");
   assert.equal(grupoDoTipo("categoria"), "perfil");
   assert.equal(grupoDoTipo("descricao"), "perfil");
+  assert.equal(grupoDoTipo("atributo"), "perfil");
   assert.equal(grupoDoTipo("analise"), "decisoes");
   assert.equal(grupoDoTipo("qualquer-coisa"), "decisoes");
 });

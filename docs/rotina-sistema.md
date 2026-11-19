@@ -35,7 +35,7 @@ PRÉVIA DO PERFIL (para a página de cada cliente no painel)
 
 REGISTRO no fim:
 - insert into execucoes (tipo, resumo) values ('madrugada', '<resumo curto>') returning id.
-- Para cada ação, insert into historico (cliente_id, execucao_id, tipo, resumo, detalhe, origem, ok) com tipo em foto, servico, categoria, resposta, post, area, descricao, analise ou outro; origem = 'rotina'; ok = false quando falhou. O resumo e o detalhe de cada ação vão em português simples, sem sigla nem termo técnico: eles aparecem na tela Últimos 7 dias, que também é o que a Marktiva mostra ao cliente. Grave uma linha por ação e use sempre o cliente_id do perfil afetado (só use cliente_id nulo para o que vale para todos).
+- Para cada ação, insert into historico (cliente_id, execucao_id, tipo, resumo, detalhe, origem, ok) com tipo em foto, servico, categoria, resposta, post, area, descricao, atributo, analise, decisao ou outro; origem = 'rotina'; ok = false quando falhou. O resumo e o detalhe de cada ação vão em português simples, sem sigla nem termo técnico: eles aparecem na tela Últimos 7 dias, que também é o que a Marktiva mostra ao cliente. Grave uma linha por ação e use sempre o cliente_id do perfil afetado (só use cliente_id nulo para o que vale para todos).
 - Continue gravando o log do Drive como antes: o painel é o centro de controle, o log do Drive segue como cópia.
 ```
 

@@ -16,7 +16,7 @@ export const GRUPOS: { chave: GrupoChave; nome: string; tipos: string[] }[] = [
   { chave: "servicos", nome: "Serviços", tipos: ["servico"] },
   { chave: "postagens", nome: "Postagens", tipos: ["post"] },
   { chave: "respostas", nome: "Respostas", tipos: ["resposta"] },
-  { chave: "perfil", nome: "Dados do perfil", tipos: ["descricao", "categoria", "area"] },
+  { chave: "perfil", nome: "Dados do perfil", tipos: ["descricao", "categoria", "area", "atributo"] },
   { chave: "decisoes", nome: "Decisões e conferências", tipos: ["decisao", "analise", "outro"] },
 ];
 
