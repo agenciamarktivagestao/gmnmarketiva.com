@@ -1,5 +1,21 @@
 [
   {
+    "feito_em": "2026-11-19T15:40:09-03:00",
+    "titulo": "Conferência no Google",
+    "resumo": "Cada ação da rotina só conta como feita depois de lida de volta no Google, e o painel mostra isso.",
+    "itens": [
+      "Selo \"Conferido no Google\" ou \"Falta conferir\" ao lado de cada ação em Últimos 7 dias, Histórico e na página do cliente",
+      "O Histórico diz quantas ações já foram conferidas lendo o perfil de volta",
+      "A rotina da madrugada relê o Google depois de cada escrita e só então marca a pendência como feita; o que ficou sem conferir é refeito na noite seguinte",
+      "As 47 ações já registradas foram relidas no Google em 19/11 e estão marcadas como conferidas"
+    ],
+    "como_testar": "Abra Últimos 7 dias ou Histórico: cada ação que mexe no Google mostra o selo. Amanhã cedo, as ações da noite devem chegar já conferidas.",
+    "pendente": "A primeira noite com a conferência nova é a de 19 para 20/11. Se uma ação ficar com \"Falta conferir\", o detalhe diz o que o Google ainda não mostra.",
+    "tipo": "painel",
+    "commit_sha": "89cd568",
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-18T11:30:12-03:00",
     "titulo": "Alertas de atenção no Painel",
     "resumo": "O Painel mostra o que pede atenção: rotina sem registro, ações que falharam e clientes sem ação na semana.",
