@@ -18,7 +18,8 @@ A leitura e a escrita nos perfis do Google acontecem no Claude (conector Windsor
 
 1. A rotina grava no Supabase o diagnóstico dos perfis, as pendências e cada ação que executou (tabelas `diagnosticos`, `pendencias`, `historico`).
 2. Você decide aqui: aprova, recusa, comenta.
-3. Na rodada seguinte, a rotina lê `pendencias` com `status = 'aprovada'` e os `comentarios` novos, executa o que for possível e marca como `concluida`, registrando em `historico`.
+3. Na rodada seguinte, a rotina lê `pendencias` com `status = 'aprovada'` e os `comentarios` novos, executa o que for possível e registra em `historico`.
+4. **Conferência no Google:** a rotina relê o perfil no Google depois de cada escrita. Só então marca a pendência como `concluida` e preenche `historico.conferido_em`; o painel mostra "Conferido no Google" ao lado da ação. Ação sem conferência aparece como "Falta conferir".
 
 ### Tom, serviços, imagens e conteúdo
 
@@ -49,7 +50,7 @@ As tabelas e as regras de acesso estão em `supabase/migrations`, para rodar em 
 | `pendencias` | O que falta fazer. `quem`: `eu` (rotina), `voce` (equipe/cliente), `bloq` (só pelo Chrome ou plano pago). `status`: `aberta`, `aprovada`, `recusada`, `concluida` |
 | `comentarios` | Conversa em cada pendência |
 | `execucoes` | Uma linha por rodada da rotina |
-| `historico` | Cada ação feita, com tipo, cliente e resultado |
+| `historico` | Cada ação feita, com tipo, cliente, resultado e `conferido_em` (quando foi relida no Google) |
 | `diretrizes` | Ideia principal e tom de voz, geral e por cliente |
 | `servicos` | Serviços de cada perfil e a decisão sobre cada um |
 | `midias` | Imagens na fila para subir no Google e as já enviadas (arquivos no bucket `midias`) |

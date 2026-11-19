@@ -3,6 +3,7 @@ import { ORIGEM, agruparDiaPorCliente } from "@/lib/semana";
 import type { Semana } from "@/lib/semana";
 import { TIPO_EVENTO, hora } from "@/lib/rotulos";
 import type { Cliente, Evento } from "@/lib/tipos";
+import { SeloConferencia } from "./SeloConferencia";
 
 const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
 const primeiraMaiuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
@@ -14,7 +15,8 @@ function Linha({ e }: { e: Evento }) {
       <div>
         <p>
           <span className="etiqueta">{TIPO_EVENTO[e.tipo] ?? e.tipo}</span>{" "}
-          <span className="etiqueta etiqueta-origem">{ORIGEM[e.origem] ?? e.origem}</span>
+          <span className="etiqueta etiqueta-origem">{ORIGEM[e.origem] ?? e.origem}</span>{" "}
+          <SeloConferencia e={e} />
           {!e.ok && (
             <>
               {" "}

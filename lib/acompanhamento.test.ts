@@ -44,6 +44,7 @@ test("uma resposta completa vira o acompanhamento, com campos neutros no que o b
     origem: "publico",
     ok: true,
     ocorreu_em: "2026-11-18T05:20:00Z",
+    conferido_em: null,
   });
   assert.equal(a.diagnostico?.impressoes, 1200);
   assert.equal(a.geradoEm, "2026-11-18T13:00:00Z");

@@ -45,7 +45,7 @@ export function lerRespostaPublica(bruto: unknown): Acompanhamento | null {
     const quando = texto(e?.ocorreu_em);
     if (!e || !id || !tipo || !resumo || !quando || Number.isNaN(Date.parse(quando))) continue;
     // O banco não manda "detalhe", origem nem ações que falharam: aqui entram só como valores neutros
-    eventos.push({ id, cliente_id: null, tipo, resumo, detalhe: null, origem: "publico", ok: true, ocorreu_em: quando });
+    eventos.push({ id, cliente_id: null, tipo, resumo, detalhe: null, origem: "publico", ok: true, ocorreu_em: quando, conferido_em: null });
   }
 
   const d = registro(r.diagnostico);

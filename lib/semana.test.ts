@@ -27,6 +27,7 @@ const evento = (
   origem: "rotina",
   ok: true,
   ocorreu_em: quando,
+  conferido_em: null as string | null,
   ...extra,
 });
 
@@ -189,6 +190,7 @@ const evRel = (id: string, tipo: string, extra: Partial<{ ok: boolean; origem: s
   origem: "rotina",
   ok: true,
   ocorreu_em: "2026-11-18T05:00:00Z",
+  conferido_em: null as string | null,
   ...extra,
 });
 

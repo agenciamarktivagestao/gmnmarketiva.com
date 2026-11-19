@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { listarClientes, listarHistorico } from "@/lib/dados";
+import { SeloConferencia } from "@/components/SeloConferencia";
+import { contarConferencia } from "@/lib/conferencia";
 import { TIPO_EVENTO, dataLonga, hora } from "@/lib/rotulos";
 
 export const metadata: Metadata = { title: "Histórico" };
@@ -12,6 +14,8 @@ export default async function Historico({ searchParams }: { searchParams: Promis
   const cliente = clientes.find((c) => c.slug === busca.cliente);
 
   const filtrados = eventos.filter((e) => (!busca.tipo || e.tipo === busca.tipo) && (!cliente || e.cliente_id === cliente.id));
+  const conferencia = contarConferencia(filtrados);
+  const noGoogle = conferencia.conferidas + conferencia.faltam;
 
   const dias = new Map<string, typeof filtrados>();
   filtrados.forEach((e) => {
@@ -32,6 +36,15 @@ export default async function Historico({ searchParams }: { searchParams: Promis
       <section className="abertura">
         <h1>Histórico</h1>
         <p className="lead">O que a rotina da madrugada e a equipe fizeram nos perfis, do mais recente para o mais antigo.</p>
+        {noGoogle > 0 && (
+          <p className="conferencia-resumo">
+            {conferencia.faltam === 0
+              ? `Todas as ${noGoogle} ações que mexeram no Google foram conferidas lendo o perfil de volta.`
+              : `${conferencia.conferidas} de ${noGoogle} ações que mexeram no Google foram conferidas lendo o perfil de volta. ${
+                  conferencia.faltam === 1 ? "Falta 1." : `Faltam ${conferencia.faltam}.`
+                }`}
+          </p>
+        )}
       </section>
 
       <div className="filtros">
@@ -89,7 +102,7 @@ export default async function Historico({ searchParams }: { searchParams: Promis
                     <p className="evento-quando">{hora(e.ocorreu_em)}</p>
                     <div>
                       <p>
-                        <span className="etiqueta">{TIPO_EVENTO[e.tipo] ?? e.tipo}</span>
+                        <span className="etiqueta">{TIPO_EVENTO[e.tipo] ?? e.tipo}</span> <SeloConferencia e={e} />
                         {!e.ok && <span className="etiqueta etiqueta-alta">Falhou</span>}{" "}
                         {cli ? <Link href={`/clientes/${cli.slug}`}>{cli.nome}</Link> : <span>Todos os perfis</span>}
                       </p>

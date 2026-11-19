@@ -16,6 +16,7 @@ const evento = (
   origem: "rotina",
   ok: true,
   ocorreu_em: quando,
+  conferido_em: null as string | null,
   ...extra,
 });
 

@@ -85,6 +85,8 @@ export type Evento = {
   origem: string;
   ok: boolean;
   ocorreu_em: string;
+  // Quando a ação foi relida no Google e confirmada. Vazio = ainda ninguém conferiu.
+  conferido_em: string | null;
 };
 
 // Uma linha do registro de mudanças (/novidades)

@@ -2975,6 +2975,23 @@ input[type="radio"] {
   background: var(--azul-claro);
   color: var(--azul-escuro);
 }
+/* Conferência no Google: azul cheio = relido e confirmado; contorno tracejado = ainda falta conferir */
+.etiqueta-conferido {
+  border-color: var(--azul);
+  background: var(--azul);
+  color: var(--papel);
+  font-weight: 650;
+}
+.etiqueta-falta {
+  border-style: dashed;
+  border-color: var(--preto);
+  color: var(--preto);
+}
+.conferencia-resumo {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
 
 @media (max-width: 720px) {
   .semana-resumo {

@@ -114,6 +114,7 @@ export function eventosDemonstracao(agora: Date): Evento[] {
         origem: x.origem,
         ok: x.ok ?? true,
         ocorreu_em: new Date(instante).toISOString(),
+        conferido_em: x.dias >= 1 ? new Date(instante + 10 * 60_000).toISOString() : null,
       },
     ];
   });

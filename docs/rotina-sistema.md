@@ -44,3 +44,15 @@ REGISTRO no fim:
 1. No Claude, abra a rotina e, em conectores, ligue o **Supabase**. Ela foi criada sem ele.
 2. Peça para atualizar as rotinas com este texto.
 3. Confira na rodada seguinte: o painel mostra as linhas novas em **Últimos 7 dias** (mapa da semana e dia a dia, geral e por cliente) e em **Histórico**, e imagens, serviços e conteúdo aprovados mudam de situação.
+
+## Conferência no Google
+
+Regra do dono: o painel é a fonte única, e tudo o que ele registra precisa ter acontecido de verdade no Google.
+
+- `historico.conferido_em` (migration `20261119000010_historico_conferencia.sql`) fica vazio até alguém reler o perfil no Google e confirmar. A rotina preenche com `now()` só quando a releitura bate com o que foi enviado.
+- Como conferir, por tipo: resposta (`review_reply_comment` do `review_id`), postagem (`post_state` LIVE), foto (`media_id` novos na galeria), serviços (contagem e descrições), categorias (ids), área (lugares) e descrição (texto igual).
+- Se o Google ainda não mostra, `conferido_em` fica vazio e o detalhe explica. Se mostra algo diferente, a linha vai com `ok = false`.
+- No começo de cada noite a rotina refaz a conferência do que ficou pendente (`conferido_em is null and ok`, fora `analise`, `decisao` e `outro`).
+- Pendências, serviços, mídias e conteúdos só passam para `concluida`, `no_perfil`, `enviada` ou `publicado` depois de conferidos.
+- No painel (Últimos 7 dias, Histórico e a página do cliente), cada ação que mexe no Google mostra "Conferido no Google" ou "Falta conferir". Decisões, análises e ações que falharam não ganham selo. O relatório do cliente e o link público não mostram a conferência.
+- A leitura deve separar os perfis pelo id do local: a Clínica Dentária Central Norte aparece duas vezes no Windsor com o mesmo título (o segundo perfil é duplicado e não deve ser alterado).

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Fase } from "./Fase";
 import { ItemPendencia } from "./ItemPendencia";
 import { Estrelas } from "./PreviaGoogle";
+import { SeloConferencia } from "./SeloConferencia";
 import { camposDaPendencia, nomeDoCampo } from "@/lib/campos";
 import {
   NOME_LINK,
@@ -202,7 +203,7 @@ export function PerfilCliente({ cliente, perfil, diagnostico, pendencias, evento
                       {dataCurta(e.ocorreu_em)} {hora(e.ocorreu_em)}
                     </p>
                     <p>
-                      <span className="etiqueta">{TIPO_EVENTO[e.tipo] ?? e.tipo}</span> {e.resumo}
+                      <span className="etiqueta">{TIPO_EVENTO[e.tipo] ?? e.tipo}</span> <SeloConferencia e={e} /> {e.resumo}
                     </p>
                   </li>
                 ))}

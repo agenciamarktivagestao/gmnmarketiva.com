@@ -87,6 +87,7 @@ function demoHistorico(): Evento[] {
       origem: "analise",
       ok: true,
       ocorreu_em: "2026-11-16T21:00:00Z",
+      conferido_em: null,
     },
   ];
 }
@@ -156,7 +157,7 @@ export async function listarHistorico(limite = 300): Promise<Evento[]> {
   const sb = await supabaseServidor();
   const { data, error } = await sb
     .from("historico")
-    .select("id,cliente_id,tipo,resumo,detalhe,origem,ok,ocorreu_em")
+    .select("id,cliente_id,tipo,resumo,detalhe,origem,ok,ocorreu_em,conferido_em")
     .order("ocorreu_em", { ascending: false })
     .limit(limite);
   if (error) throw new Error(error.message);
@@ -171,7 +172,7 @@ export const listarEventosDesde = cache(async (desdeISO: string, limite = 3000):
     const sb = await supabaseServidor();
     const { data, error } = await sb
       .from("historico")
-      .select("id,cliente_id,tipo,resumo,detalhe,origem,ok,ocorreu_em")
+      .select("id,cliente_id,tipo,resumo,detalhe,origem,ok,ocorreu_em,conferido_em")
       .gte("ocorreu_em", desdeISO)
       .order("ocorreu_em", { ascending: false })
       .limit(limite);
