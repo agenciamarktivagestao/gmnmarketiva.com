@@ -1,5 +1,20 @@
 [
   {
+    "feito_em": "2026-11-23T16:42:00-03:00",
+    "titulo": "Histórico ganha o tipo Atributos",
+    "resumo": "As ações sobre atributos do perfil (pagamento, estacionamento e outros) agora aparecem no Histórico com nome próprio.",
+    "itens": [
+      "Etiqueta e filtro \"Atributos\" no Histórico; em Últimos 7 dias entram em \"Dados do perfil\"",
+      "Como as demais ações no Google, mostram \"Conferido no Google\" ou \"Falta conferir\"",
+      "Já estão registradas as quatro ações de pagamento de 19/11 (Sergipe, Dra. Ana Luiza, Garagem 3 e Aline Ceccotti: cartão de crédito Visa e Mastercard), todas conferidas lendo o perfil de volta"
+    ],
+    "como_testar": "Abra o Histórico, escolha o filtro Atributos e veja as quatro ações de 19/11.",
+    "pendente": "A rotina da madrugada ainda não altera atributos (depende do dono). As outras opções marcadas nas pendências de atributos (estacionamento, acessibilidade, hora marcada, agendamento online, entrega e link do WhatsApp) esperam o detalhe de cada uma.",
+    "tipo": "painel",
+    "commit_sha": "0b1fbd3",
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-19T15:40:09-03:00",
     "titulo": "Conferência no Google",
     "resumo": "Cada ação da rotina só conta como feita depois de lida de volta no Google, e o painel mostra isso.",
