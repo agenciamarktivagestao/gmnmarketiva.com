@@ -1,5 +1,22 @@
 [
   {
+    "feito_em": "2026-11-26T17:58:00-03:00",
+    "titulo": "Desempenho ganha visual de painel, com projeção",
+    "resumo": "As duas telas de Desempenho ficaram mais visuais: números grandes no topo, gráficos e mapa de calor em vez de tabelas soltas.",
+    "itens": [
+      "Faixa preta de números (aparições, ligações, rotas, cliques no site e nota) com variação e mini-gráfico dos dias",
+      "Projeção para os próximos 30 dias em cada número, pelo ritmo dos últimos 14 dias, com uma faixa de mínimo e máximo; é estimativa, não garantia",
+      "Gráfico maior com os dias de ação marcados, duas roscas (Busca ou Maps; celular ou computador) e o que as pessoas fizeram a cada 100 aparições",
+      "Visão de todos os clientes: quem mais subiu e quem mais caiu, mapa de calor semana a semana (cada cliente comparado com a própria média) e quem mais aparece",
+      "Funciona no celular: o mapa de calor rola para o lado"
+    ],
+    "como_testar": "Abra Desempenho no menu, troque a janela (7, 14 ou 28 dias) e entre em um cliente para ver a faixa de números e a projeção.",
+    "pendente": "O ranking da empresa por região (Londrina, Cambé e Ibiporã) ainda não aparece: depende de uma ferramenta paga de posição, e o espaço já está reservado nas duas telas.",
+    "tipo": "painel",
+    "commit_sha": "e76be3f",
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-26T17:21:00-03:00",
     "titulo": "Rotina da madrugada passa a alimentar o Desempenho",
     "resumo": "Toda noite a rotina lê no Google (só leitura) os números dos últimos 30 dias e grava no painel, para a evolução não se perder.",
