@@ -1,5 +1,37 @@
 [
   {
+    "feito_em": "2026-11-26T17:21:00-03:00",
+    "titulo": "Rotina da madrugada passa a alimentar o Desempenho",
+    "resumo": "Toda noite a rotina lê no Google (só leitura) os números dos últimos 30 dias e grava no painel, para a evolução não se perder.",
+    "itens": [
+      "Grava por dia as aparições no Maps e na Busca (computador e celular), ligações, cliques no site, rotas e reservas, até 3 dias antes de hoje",
+      "Grava os termos de busca dos meses já fechados e a nota e o total de avaliações de cada perfil",
+      "Não escreve no Google, não conta como ajuste e roda mesmo com a rotina pausada"
+    ],
+    "como_testar": "Amanhã de manhã abra Desempenho: o último dia dos números deve ser 24/11 e avançar um dia a cada manhã.",
+    "pendente": "Vale a partir da rotina de 27/11, às 02:37. Até lá os números ficam parados em 23/11.",
+    "tipo": "rotina",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-26T17:20:00-03:00",
+    "titulo": "Desempenho: como cada perfil aparece nas buscas",
+    "resumo": "Página nova que mostra, cliente a cliente, se o perfil está aparecendo mais ou menos no Google e no Maps, junto com o que foi feito no perfil.",
+    "itens": [
+      "Visão geral em Desempenho: todos os clientes lado a lado, com janela de 7, 14 ou 28 dias e ordem por volume, queda ou nome",
+      "Aba Desempenho em cada cliente: gráfico diário com a média de 7 dias e um losango nos dias em que agimos no perfil",
+      "Também mostra ligações, cliques no site, pedidos de rota, termos de busca do mês, nota e total de avaliações",
+      "Só compara períodos completos, mostra porcentagem apenas com base de 10 ou mais e deixa o dia sem dado como lacuna, nunca como zero",
+      "Carga inicial de 27 dias (28/10 a 23/11) de 14 perfis; o Google leva cerca de 3 dias para fechar cada dia"
+    ],
+    "como_testar": "Abra Desempenho no menu, troque a janela para 14 ou 28 dias e entre em um cliente para ver o gráfico. No celular, toque numa coluna para ver o dia.",
+    "pendente": "O Google não informa a posição do cliente na busca: isso depende de uma ferramenta paga de rastreio de posição (segunda etapa). Ótica Sergipe (desconectada no Windsor) e Limpa Cano ainda não têm números.",
+    "tipo": "painel",
+    "commit_sha": "e5a68dd",
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-23T16:42:00-03:00",
     "titulo": "Histórico ganha o tipo Atributos",
     "resumo": "As ações sobre atributos do perfil (pagamento, estacionamento e outros) agora aparecem no Histórico com nome próprio.",
