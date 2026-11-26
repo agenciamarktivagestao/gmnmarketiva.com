@@ -9,6 +9,7 @@ export function AbasCliente({ slug }: { slug: string }) {
   const abas = [
     { href: base, nome: "Visão geral" },
     { href: `${base}/semana`, nome: "Últimos 7 dias" },
+    { href: `${base}/desempenho`, nome: "Desempenho" },
     { href: `${base}/servicos`, nome: "Serviços" },
     { href: `${base}/imagens`, nome: "Imagens" },
     { href: `${base}/diretrizes`, nome: "Tom e diretrizes" },

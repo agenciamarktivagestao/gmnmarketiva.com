@@ -2,6 +2,9 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { cache } from "react";
 import { modoDemonstracao } from "./ambiente";
+import { desempenhoDemonstracao, reputacaoDemonstracao, termosDemonstracao } from "./desempenho-demo";
+import { somarDiasNaData } from "./desempenho";
+import type { DiaDoCliente, Reputacao, TermoBusca } from "./desempenho";
 import { eventosDemonstracao } from "./historico-demo";
 import { kindDemonstracao } from "./kinds";
 import { normalizarMudancas } from "./mudancas";
@@ -11,7 +14,7 @@ import type { PerfilLido } from "./perfil";
 import { perfilDemonstracao } from "./perfil-demo";
 import { TOKEN_DEMO, lerRespostaPublica } from "./acompanhamento";
 import type { Acompanhamento, LinkDoCliente } from "./acompanhamento";
-import { paraOCliente } from "./semana";
+import { diaChave, paraOCliente } from "./semana";
 import { supabasePublico, supabaseServidor } from "./supabase";
 import type {
   AjustesCliente,
@@ -182,6 +185,67 @@ export const listarEventosDesde = cache(async (desdeISO: string, limite = 3000):
     console.error("historico da semana:", e instanceof Error ? e.message : e);
     return [];
   }
+});
+
+// ---------------------------------------------------------------------------
+// Desempenho dos perfis (números diários, termos de busca e avaliações que a rotina grava a partir do Windsor)
+// ---------------------------------------------------------------------------
+const TAMANHO_DA_PAGINA = 1000; // o limite de linhas por consulta do Supabase
+
+type Pagina<T> = PromiseLike<{ data: T[] | null; error: { message: string } | null }>;
+
+async function lerEmPaginas<T>(consulta: (de: number, ate: number) => Pagina<T>): Promise<T[]> {
+  const tudo: T[] = [];
+  for (let de = 0; ; de += TAMANHO_DA_PAGINA) {
+    const { data, error } = await consulta(de, de + TAMANHO_DA_PAGINA - 1);
+    if (error) throw new Error(error.message);
+    tudo.push(...(data ?? []));
+    if (!data || data.length < TAMANHO_DA_PAGINA) return tudo;
+  }
+}
+
+// Na demonstração, o último dia com número é três dias antes de hoje (o Google fecha cada dia com esse atraso),
+// do mesmo jeito que as ações de demonstração do histórico: assim os dois se encontram na tela
+const demoUltimoDiaDesempenho = () => somarDiasNaData(diaChave(new Date()), -3);
+const demoIdDoCliente = (slug: string) => `c-${slug}`;
+
+// Números por dia de todos os clientes (ou de um só) a partir de `desdeDia`, do mais antigo para o mais novo
+export const listarDesempenho = cache(async (desdeDia: string, clienteId?: string): Promise<DiaDoCliente[]> => {
+  if (modoDemonstracao()) {
+    return desempenhoDemonstracao(lerSeed().diagnosticos, demoIdDoCliente, demoUltimoDiaDesempenho())
+      .filter((d) => d.dia >= desdeDia && (!clienteId || d.cliente_id === clienteId))
+      .sort((a, b) => a.dia.localeCompare(b.dia));
+  }
+  const sb = await supabaseServidor();
+  return lerEmPaginas<DiaDoCliente>((de, ate) => {
+    const consulta = sb
+      .from("desempenho_diario")
+      .select("cliente_id,dia,maps_pc,busca_pc,maps_cel,busca_cel,ligacoes,cliques_site,rotas,reservas")
+      .gte("dia", desdeDia)
+      .order("dia")
+      .order("cliente_id")
+      .range(de, ate);
+    return clienteId ? consulta.eq("cliente_id", clienteId) : consulta;
+  });
+});
+
+// Termos que levaram as pessoas ao perfil, por mês
+export const listarTermos = cache(async (clienteId: string): Promise<TermoBusca[]> => {
+  if (modoDemonstracao()) return termosDemonstracao(demoIdDoCliente).filter((t) => t.cliente_id === clienteId);
+  const sb = await supabaseServidor();
+  return lerEmPaginas<TermoBusca>((de, ate) =>
+    sb.from("desempenho_termos").select("cliente_id,mes,termo,usuarios,abaixo_de").eq("cliente_id", clienteId).order("mes", { ascending: false }).order("termo").range(de, ate),
+  );
+});
+
+// Nota e total de avaliações lidos desde `desdeDia` (a tela usa a leitura mais recente de cada cliente)
+export const listarReputacao = cache(async (desdeDia: string): Promise<Reputacao[]> => {
+  if (modoDemonstracao()) return reputacaoDemonstracao(demoIdDoCliente, demoUltimoDiaDesempenho());
+  const sb = await supabaseServidor();
+  const linhas = await lerEmPaginas<{ cliente_id: string; dia: string; nota: number | string | null; total_avaliacoes: number | null }>((de, ate) =>
+    sb.from("desempenho_reputacao").select("cliente_id,dia,nota,total_avaliacoes").gte("dia", desdeDia).order("dia").order("cliente_id").range(de, ate),
+  );
+  return linhas.map((r) => ({ ...r, nota: r.nota === null ? null : Number(r.nota) }));
 });
 
 export async function listarEquipe(): Promise<Membro[]> {

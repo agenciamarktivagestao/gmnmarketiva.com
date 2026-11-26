@@ -3585,3 +3585,455 @@ input[type="radio"] {
   font-size: 0.88rem;
   color: var(--tinta-suave);
 }
+
+/* ---------- Desempenho ---------- */
+
+.desempenho-nota {
+  font-size: 0.9rem;
+  padding: 0;
+}
+.desempenho-filtro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+.desempenho-filtro .chips {
+  margin: 0;
+}
+
+/* Os quatro números do topo: dia a dia somados, com a variação e o traço */
+.desempenho-resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 0.75rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--linha);
+  overflow: hidden;
+}
+.desempenho-resumo > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  min-width: 0;
+  padding: 1rem 1.1rem;
+  background: var(--papel);
+}
+.desempenho-resumo dt {
+  font-size: 0.84rem;
+  color: var(--tinta-suave);
+}
+.desempenho-resumo dd {
+  margin: 0;
+}
+.desempenho-resumo dd:nth-of-type(1) {
+  font-size: 2.1rem;
+  font-weight: 700;
+  font-stretch: 82%;
+  line-height: 1;
+}
+.desempenho-resumo-traco {
+  margin-top: 0.35rem;
+}
+.desempenho-legenda-resumo {
+  margin-bottom: 1rem;
+}
+.desempenho-trabalho {
+  max-width: 72ch;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+/* A variação: seta, palavra e número dizem a mesma coisa (nada depende só da cor) */
+.variacao {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.variacao-subiu {
+  color: var(--azul-escuro);
+}
+.variacao-caiu {
+  padding: 0 0.5rem;
+  border: 1px solid var(--preto);
+  border-radius: 999px;
+  color: var(--preto);
+}
+.variacao-igual,
+.variacao-sem {
+  color: var(--tinta-suave);
+  font-weight: 500;
+}
+.variacao-sem {
+  white-space: normal;
+  font-size: 0.78rem;
+}
+
+.tendencia {
+  display: block;
+  overflow: visible;
+}
+
+/* Lista de clientes */
+.desempenho-clientes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--linha);
+}
+.desempenho-linha {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1.3fr) minmax(8rem, 1fr) minmax(8rem, 1fr) 7.5rem;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.8rem 0.9rem;
+  border-bottom: 1px solid var(--linha);
+  text-decoration: none;
+  color: inherit;
+}
+.desempenho-linha:hover {
+  background: var(--suave);
+}
+.desempenho-nome {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+.desempenho-reputacao {
+  font-size: 0.8rem;
+  font-weight: 450;
+  color: var(--tinta-suave);
+}
+.desempenho-numero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  font-size: 0.86rem;
+  color: var(--tinta-suave);
+}
+.desempenho-numero strong {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-stretch: 82%;
+  line-height: 1;
+  color: var(--tinta);
+}
+.desempenho-traco {
+  display: flex;
+  justify-content: flex-end;
+}
+.desempenho-sem-dados,
+.desempenho-aviso {
+  font-size: 0.84rem;
+  color: var(--tinta-suave);
+}
+.desempenho-sem-dados {
+  grid-column: 2 / -1;
+}
+.desempenho-aviso {
+  grid-column: 1 / -1;
+}
+
+/* Barras de ranking: o número fica na ponta */
+.ranking {
+  display: grid;
+  gap: 0.55rem;
+  max-width: 44rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+.ranking li {
+  display: grid;
+  grid-template-columns: minmax(9rem, 17rem) minmax(0, 1fr) 3.5rem;
+  align-items: center;
+  gap: 0.25rem 0.85rem;
+}
+.ranking-nome {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.ranking-trilho {
+  display: block;
+  height: 12px;
+}
+.ranking-barra {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: var(--azul);
+}
+.ranking-valor {
+  font-size: 0.9rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ranking-valor strong {
+  font-weight: 650;
+}
+
+/* Gráfico por dia */
+.grafico {
+  max-width: 54rem;
+  margin-bottom: 0.75rem;
+}
+.grafico-area {
+  position: relative;
+  border-radius: var(--raio);
+}
+.grafico-svg {
+  display: block;
+  touch-action: pan-y;
+}
+.grafico-grade {
+  stroke: var(--linha);
+  stroke-width: 1;
+}
+.grafico-mira {
+  stroke: var(--linha-forte);
+  stroke-width: 1;
+}
+.grafico-texto {
+  fill: var(--tinta-suave);
+  font-size: 12px;
+  font-family: inherit;
+}
+.grafico-rotulo-final {
+  fill: var(--tinta);
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: var(--papel);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.grafico-coluna {
+  fill: var(--azul);
+}
+.grafico-coluna-ativa {
+  fill: var(--azul-escuro);
+}
+.grafico-media {
+  fill: none;
+  stroke: var(--preto);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.grafico-anel {
+  fill: var(--papel);
+}
+.grafico-ponto,
+.grafico-marca {
+  fill: var(--preto);
+}
+.grafico-dica {
+  position: absolute;
+  top: 0.4rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-width: 15rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--raio);
+  background: var(--preto);
+  color: #fff;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  pointer-events: none;
+}
+.grafico-dica strong {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.grafico-dica-dia {
+  color: #c9cfdd;
+}
+.grafico-dica-linha {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.grafico-dica-acao {
+  margin-top: 0.15rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid #3a4052;
+}
+.grafico-chave {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  background: #fff;
+}
+.grafico-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.25rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+.grafico-legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.grafico-legenda-coluna {
+  width: 10px;
+  height: 12px;
+  border-radius: 3px 3px 0 0;
+  background: var(--azul);
+}
+.grafico-legenda-linha {
+  width: 16px;
+  height: 2px;
+  background: var(--preto);
+}
+.grafico-legenda-marca {
+  width: 8px;
+  height: 8px;
+  margin: 0 1px;
+  background: var(--preto);
+  transform: rotate(45deg);
+}
+
+/* Termos, ações e avaliação */
+.desempenho-poucos {
+  max-width: 44rem;
+  font-size: 0.9rem;
+}
+.desempenho-poucos summary {
+  cursor: pointer;
+  color: var(--azul);
+  font-weight: 560;
+}
+.desempenho-poucos ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.4rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.desempenho-poucos li {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--linha);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+}
+.desempenho-nota-grande {
+  font-size: 1rem;
+}
+.desempenho-nota-grande strong {
+  font-size: 2.1rem;
+  font-weight: 700;
+  font-stretch: 82%;
+  line-height: 1;
+}
+.desempenho-acoes {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.92rem;
+}
+.desempenho-acoes strong {
+  display: inline-block;
+  min-width: 3rem;
+}
+
+/* Tabela com todos os números (a mesma informação dos gráficos, em texto) */
+.desempenho-tabela-rolagem {
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+.desempenho-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.desempenho-tabela th,
+.desempenho-tabela td {
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid var(--linha);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.desempenho-tabela thead th {
+  font-size: 0.8rem;
+  font-weight: 560;
+  color: var(--tinta-suave);
+  vertical-align: bottom;
+}
+.desempenho-tabela th:first-child,
+.desempenho-tabela td:first-child {
+  text-align: left;
+}
+.desempenho-tabela tbody th {
+  font-weight: 560;
+}
+.desempenho-tabela td[colspan] {
+  text-align: left;
+  color: var(--tinta-suave);
+}
+
+@media (max-width: 720px) {
+  .desempenho-resumo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .desempenho-resumo > div {
+    padding: 0.85rem 0.9rem;
+  }
+  .desempenho-linha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 1rem;
+    padding: 0.9rem 0.25rem;
+  }
+  .desempenho-nome,
+  .desempenho-traco,
+  .desempenho-sem-dados {
+    grid-column: 1 / -1;
+  }
+  .desempenho-traco {
+    justify-content: flex-start;
+  }
+  .ranking li {
+    grid-template-columns: minmax(0, 1fr) 3.25rem;
+    grid-template-areas:
+      "nome valor"
+      "trilho trilho";
+  }
+  .ranking-nome {
+    grid-area: nome;
+  }
+  .ranking-valor {
+    grid-area: valor;
+  }
+  .ranking-trilho {
+    grid-area: trilho;
+  }
+}
+
+@media print {
+  .desempenho-filtro,
+  .grafico-dica {
+    display: none;
+  }
+}
