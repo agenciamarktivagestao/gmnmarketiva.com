@@ -4345,6 +4345,199 @@ input[type="radio"] {
   margin-left: 0.15rem;
 }
 
+/* Ranking regional: mapa da grade de posições */
+.grade-figura {
+  position: relative; /* contém os textos .sr-only dos quadrados */
+  flex: none;
+  width: min(100%, calc(var(--n) * 3.2rem));
+  margin: 0;
+}
+.grade-norte {
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--tinta-suave);
+}
+.grade {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+.grade td {
+  height: clamp(1.4rem, calc(18rem / var(--n)), 3rem);
+  padding: 0;
+  border-radius: 3px;
+  font-size: clamp(0.62rem, calc(5.6rem / var(--n)), 0.95rem);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
+}
+.grade-top3 {
+  background: #0f43b8;
+  color: #fff;
+}
+.grade-top10 {
+  background: #6aa2ff;
+  color: var(--tinta);
+}
+.grade-top20 {
+  background: #b7cdfa;
+  color: var(--tinta);
+}
+.grade-fora {
+  background: #e6efff;
+  color: var(--tinta-suave);
+  font-weight: 500;
+}
+.grade-sem {
+  background: var(--papel);
+  outline: 1px dashed var(--linha-forte);
+  outline-offset: -1px;
+  color: var(--tinta-suave);
+  font-weight: 500;
+}
+.grade-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.74rem;
+  color: var(--tinta-suave);
+}
+.grade-chave {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 2px;
+  vertical-align: -0.1rem;
+}
+
+.ranking-palavras-lista {
+  display: grid;
+  gap: 1.5rem;
+}
+.ranking-palavra {
+  min-width: 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--linha);
+}
+.ranking-palavra:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.ranking-palavra h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+.ranking-meta {
+  margin: 0.15rem 0 0.8rem;
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+}
+.ranking-corpo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.1rem 2rem;
+}
+.ranking-lado {
+  flex: 1 1 15rem;
+  min-width: 0;
+}
+.ranking-numeros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.6rem;
+  margin: 0;
+}
+.ranking-numeros > div {
+  min-width: 7.5rem;
+}
+.ranking-numeros dt {
+  font-size: 0.8rem;
+  color: var(--tinta-suave);
+}
+.ranking-numeros dd {
+  margin: 0.1rem 0 0;
+}
+.ranking-numeros strong {
+  font-size: 1.6rem;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.ranking-numeros small {
+  font-size: 0.78rem;
+  color: var(--tinta-suave);
+}
+.ranking-mudanca {
+  margin: 0.7rem 0 0;
+}
+.ranking-aviso {
+  max-width: 60ch;
+  margin: 0.7rem 0 0;
+  padding: 0.5rem 0.7rem;
+  border: 1px dashed var(--linha-forte);
+  border-radius: var(--raio);
+  background: var(--suave);
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+}
+.ranking-historico {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.1rem;
+  margin-top: 0.9rem;
+}
+.ranking-historico ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+.ranking-historico li span {
+  color: var(--tinta-suave);
+}
+.ranking-resumo {
+  margin: 0.1rem 0 0.5rem;
+  font-size: 0.92rem;
+}
+.ranking-tabela tbody th a {
+  color: var(--tinta);
+  text-decoration: none;
+}
+.ranking-tabela tbody th a:hover {
+  text-decoration: underline;
+}
+.ranking-tabela thead th:nth-child(4),
+.ranking-tabela td.ranking-mudou {
+  text-align: left;
+}
+.ranking-quando {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.74rem;
+  font-weight: 400;
+  color: var(--tinta-suave);
+}
+.ranking-palavras {
+  font-weight: 400;
+  color: var(--tinta-suave);
+}
+.ranking-sem {
+  margin: 0.75rem 0 0;
+}
+
 /* Quem mais subiu e quem mais caiu */
 .variacao-lista {
   display: grid;
@@ -4439,6 +4632,27 @@ input[type="radio"] {
   }
   .calor tbody th {
     max-width: 8.5rem;
+  }
+  .ranking-corpo {
+    gap: 0.9rem;
+  }
+  .ranking-numeros > div {
+    min-width: 6.5rem;
+  }
+  /* A tabela do ranking cabe na tela do celular: menos espaço entre colunas e a frase da mudança pode quebrar a linha */
+  .ranking-tabela th,
+  .ranking-tabela td {
+    padding: 0.45rem 0.4rem;
+  }
+  .ranking-tabela tbody th {
+    min-width: 6.5rem;
+  }
+  .ranking-tabela .variacao {
+    white-space: normal;
+  }
+  .ranking-tabela .variacao-caiu {
+    display: inline-block;
+    border-radius: 0.7rem;
   }
 }
 

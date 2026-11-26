@@ -7,8 +7,9 @@ import { GraficoDiario } from "@/components/GraficoDiario";
 import type { MarcaDoGrafico, PontoDoGrafico } from "@/components/GraficoDiario";
 import { ResumoDesempenho } from "@/components/ResumoDesempenho";
 import type { ItemDoResumo } from "@/components/ResumoDesempenho";
+import { RankingDaPalavra } from "@/components/RankingDaPalavra";
 import { Rosca } from "@/components/Rosca";
-import { listarClientes, listarDesempenho, listarEventosDesde, listarReputacao, listarTermos } from "@/lib/dados";
+import { listarClientes, listarDesempenho, listarEventosDesde, listarRanking, listarReputacao, listarTermos } from "@/lib/dados";
 import {
   DIAS_DA_JANELA,
   aparicoesDoDia,
@@ -33,6 +34,7 @@ import {
   variacao,
 } from "@/lib/desempenho";
 import type { DiaDesempenho } from "@/lib/desempenho";
+import { agruparPorPalavra } from "@/lib/ranking";
 import { TIPO_EVENTO } from "@/lib/rotulos";
 import { GRUPOS, diaChave, grupoDoTipo, inicioDaBusca } from "@/lib/semana";
 
@@ -42,6 +44,7 @@ const DIAS_NO_GRAFICO = 90;
 const DIAS_DO_TRACO = 28;
 const TERMOS_NA_LISTA = 8;
 const DIAS_DO_TRABALHO = 28;
+const DIAS_DO_RANKING_BUSCADOS = 150; // dá para guardar o histórico de vários meses de medições a cada 15 dias
 const por100 = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const nota = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const plural = (n: number, um: string, varios: string) => `${numeroBR(n)} ${n === 1 ? um : varios}`;
@@ -55,12 +58,14 @@ export default async function DesempenhoDoCliente({ params }: { params: Promise<
   const cliente = clientes.find((c) => c.slug === slug);
   if (!cliente) notFound();
 
-  const [dias, termos, reputacao, eventos] = await Promise.all([
+  const [dias, termos, reputacao, eventos, medicoes] = await Promise.all([
     listarDesempenho(somarDiasNaData(hoje, -DIAS_NO_GRAFICO), cliente.id),
     listarTermos(cliente.id),
     listarReputacao(somarDiasNaData(hoje, -45)),
     listarEventosDesde(inicioDaBusca(agora, DIAS_NO_GRAFICO)),
+    listarRanking(somarDiasNaData(hoje, -DIAS_DO_RANKING_BUSCADOS), cliente.id),
   ]);
+  const palavrasDoRanking = agruparPorPalavra(medicoes);
 
   const ate = ultimoDiaComDado(dias);
   if (ate === null) {
@@ -275,11 +280,28 @@ export default async function DesempenhoDoCliente({ params }: { params: Promise<
           )}
         </CartaoDoPainel>
 
-        <CartaoDoPainel id="t-ranking" titulo="Posição no Google Maps" colunas={12}>
-          <p className="dash-vazio-ranking">
-            Aqui entra em que posição o perfil aparece quando alguém busca, em Londrina, Cambé e Ibiporã, e se está subindo ou caindo. O Google não informa isso: é preciso uma ferramenta de rastreio de posição,
-            que ainda não está ligada ao painel.
-          </p>
+        <CartaoDoPainel
+          id="t-ranking"
+          titulo="Posição no Google Maps"
+          colunas={12}
+          dica={
+            palavrasDoRanking.length > 0
+              ? "Em que posição o perfil aparece quando alguém faz a busca de cada ponto da região. Cada quadrado é um ponto e o número é a posição: quanto menor, melhor. 20+ quer dizer que o perfil não está entre os 20 primeiros ali. A medição é feita a cada 15 dias."
+              : undefined
+          }
+        >
+          {palavrasDoRanking.length === 0 ? (
+            <p className="dash-vazio-ranking">
+              Ainda não há medição de posição para este perfil. A medição é feita a cada 15 dias, numa grade de pontos ao redor do endereço, para as palavras de busca combinadas com a equipe. Quando a primeira chegar, o
+              mapa aparece aqui.
+            </p>
+          ) : (
+            <div className="ranking-palavras-lista">
+              {palavrasDoRanking.map((p) => (
+                <RankingDaPalavra key={p.palavra} p={p} nomeDoCliente={cliente.nome} />
+              ))}
+            </div>
+          )}
         </CartaoDoPainel>
       </div>
 

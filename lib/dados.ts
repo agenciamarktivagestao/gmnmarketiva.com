@@ -9,6 +9,9 @@ import { eventosDemonstracao } from "./historico-demo";
 import { kindDemonstracao } from "./kinds";
 import { normalizarMudancas } from "./mudancas";
 import { normalizarPerfil } from "./perfil";
+import { lerPosicoes } from "./ranking";
+import type { Medicao } from "./ranking";
+import { rankingDemonstracao } from "./ranking-demo";
 import { AJUSTES_PADRAO, normalizarAjustes } from "./rotina";
 import type { PerfilLido } from "./perfil";
 import { perfilDemonstracao } from "./perfil-demo";
@@ -246,6 +249,37 @@ export const listarReputacao = cache(async (desdeDia: string): Promise<Reputacao
     sb.from("desempenho_reputacao").select("cliente_id,dia,nota,total_avaliacoes").gte("dia", desdeDia).order("dia").order("cliente_id").range(de, ate),
   );
   return linhas.map((r) => ({ ...r, nota: r.nota === null ? null : Number(r.nota) }));
+});
+
+// Ranking regional: as medições de posição no Google Maps (uma varredura a cada 15 dias), da mais antiga para a mais nova.
+// Se a leitura falhar, a tela mostra o aviso de "ainda sem medição" em vez de derrubar a página inteira.
+export const listarRanking = cache(async (desdeDia: string, clienteId?: string): Promise<Medicao[]> => {
+  if (modoDemonstracao()) {
+    return rankingDemonstracao(demoIdDoCliente, diaChave(new Date()))
+      .filter((m) => m.dia >= desdeDia && (!clienteId || m.cliente_id === clienteId))
+      .sort((a, b) => a.dia.localeCompare(b.dia));
+  }
+  try {
+    const sb = await supabaseServidor();
+    const linhas = await lerEmPaginas<{ cliente_id: string; dia: string; palavra: string; grade: number; espacamento_km: number | string; posicoes: unknown; fonte: string }>((de, ate) => {
+      const consulta = sb
+        .from("desempenho_ranking")
+        .select("cliente_id,dia,palavra,grade,espacamento_km,posicoes,fonte")
+        .gte("dia", desdeDia)
+        .order("dia")
+        .order("cliente_id")
+        .order("palavra")
+        .range(de, ate);
+      return clienteId ? consulta.eq("cliente_id", clienteId) : consulta;
+    });
+    return linhas.flatMap((l) => {
+      const posicoes = lerPosicoes(l.posicoes, l.grade);
+      return posicoes ? [{ cliente_id: l.cliente_id, dia: l.dia, palavra: l.palavra, grade: l.grade, espacamento_km: Number(l.espacamento_km), posicoes, fonte: l.fonte }] : [];
+    });
+  } catch (e) {
+    console.error("ranking:", e instanceof Error ? e.message : e);
+    return [];
+  }
 });
 
 export async function listarEquipe(): Promise<Membro[]> {

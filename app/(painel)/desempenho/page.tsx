@@ -6,13 +6,15 @@ import { CartaoDoPainel } from "@/components/CartaoDoPainel";
 import { GraficoDiario } from "@/components/GraficoDiario";
 import type { MarcaDoGrafico, PontoDoGrafico } from "@/components/GraficoDiario";
 import { MapaDeCalor } from "@/components/MapaDeCalor";
+import { QuadroDoRanking } from "@/components/QuadroDoRanking";
+import type { LinhaDoRanking } from "@/components/QuadroDoRanking";
 import { ResumoDesempenho } from "@/components/ResumoDesempenho";
 import type { ItemDoResumo } from "@/components/ResumoDesempenho";
 import { Rosca } from "@/components/Rosca";
 import { Tendencia } from "@/components/Tendencia";
 import { Variacao } from "@/components/Variacao";
 import { contarConferencia } from "@/lib/conferencia";
-import { listarClientes, listarDesempenho, listarEventosDesde, listarReputacao } from "@/lib/dados";
+import { listarClientes, listarDesempenho, listarEventosDesde, listarRanking, listarReputacao } from "@/lib/dados";
 import {
   DIAS_DA_JANELA,
   agruparPorDia,
@@ -39,12 +41,14 @@ import {
   variacao,
 } from "@/lib/desempenho";
 import type { DiaDesempenho, DiaDoCliente, LinhaDesempenho } from "@/lib/desempenho";
+import { agruparPorCliente } from "@/lib/ranking";
 import { TIPO_EVENTO } from "@/lib/rotulos";
 import { GRUPOS, TIPOS_INTERNOS, diaChave, grupoDoTipo, inicioDaBusca } from "@/lib/semana";
 
 export const metadata: Metadata = { title: "Desempenho" };
 
 const DIAS_DO_TRACO = 28;
+const DIAS_DO_RANKING_BUSCADOS = 150; // medições a cada 15 dias: só a última e a anterior entram na conta, o resto dá folga
 const HISTORICO_BUSCADO_EM_DIAS = 70; // dá para comparar até 28 dias contra 28 dias e ainda sobra margem
 const nota = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const plural = (n: number, um: string, varios: string) => `${numeroBR(n)} ${n === 1 ? um : varios}`;
@@ -60,11 +64,12 @@ export default async function Desempenho({ searchParams }: { searchParams: Promi
   const busca = await searchParams;
   const agora = new Date();
   const hoje = diaChave(agora);
-  const [clientes, dias, reputacao, eventos] = await Promise.all([
+  const [clientes, dias, reputacao, eventos, medicoes] = await Promise.all([
     listarClientes(),
     listarDesempenho(somarDiasNaData(hoje, -HISTORICO_BUSCADO_EM_DIAS)),
     listarReputacao(somarDiasNaData(hoje, -45)),
     listarEventosDesde(inicioDaBusca(agora, 35)),
+    listarRanking(somarDiasNaData(hoje, -DIAS_DO_RANKING_BUSCADOS)),
   ]);
 
   const ate = ultimoDiaComDado(dias);
@@ -181,6 +186,19 @@ export default async function Desempenho({ searchParams }: { searchParams: Promi
   const semanasDe = new Map(comparaveis.map((x) => [x.c.id, semanasDosDias(porCliente.get(x.c.id) ?? [], ate, 8)]));
   const colunasDoCalor = [...new Map([...semanasDe.values()].flat().map((s) => [s.de, { de: s.de, ate: s.ate }])).values()].sort((a, b) => a.de.localeCompare(b.de));
   const linhasDoCalor = ordenadas.filter((x) => semanasDe.has(x.c.id)).map((x) => ({ nome: x.c.nome, href: `/clientes/${x.c.slug}/desempenho`, semanas: semanasDe.get(x.c.id) ?? [] }));
+
+  // Ranking regional: cada cliente com medição, em ordem alfabética, e quem ainda não tem
+  const rankingPorCliente = new Map(agruparPorCliente(medicoes).map((r) => [r.clienteId, r]));
+  const linhasDoRanking: LinhaDoRanking[] = clientes
+    .flatMap((c) => {
+      const resumo = rankingPorCliente.get(c.id);
+      return resumo ? [{ nome: c.nome, href: `/clientes/${c.slug}/desempenho#t-ranking`, resumo }] : [];
+    })
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  const semMedicaoDoRanking = clientes
+    .filter((c) => !rankingPorCliente.has(c.id))
+    .map((c) => ({ nome: c.nome, href: `/clientes/${c.slug}/desempenho#t-ranking` }))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 
   // Participação de cada cliente nas aparições do período
   const porVolume = [...comparaveis].sort((a, b) => b.l.comparacao.atual.totais.aparicoes - a.l.comparacao.atual.totais.aparicoes);
@@ -331,11 +349,24 @@ export default async function Desempenho({ searchParams }: { searchParams: Promi
               )}
             </CartaoDoPainel>
 
-            <CartaoDoPainel id="t-ranking" titulo="Posição no Google Maps" colunas={12}>
-              <p className="dash-vazio-ranking">
-                Aqui entra o ranking de cada empresa na região de Londrina, Cambé e Ibiporã e se ele está subindo ou caindo. O Google não informa a posição: é preciso uma ferramenta de rastreio de posição,
-                que ainda não está ligada ao painel.
-              </p>
+            <CartaoDoPainel
+              id="t-ranking"
+              titulo="Posição no Google Maps"
+              colunas={12}
+              dica={
+                linhasDoRanking.length > 0
+                  ? "Em que posição cada perfil aparece quando alguém busca na região, e se subiu ou caiu desde a medição anterior. A medição é feita a cada 15 dias. \"Subiu\" quer dizer melhor colocado. Com mais de uma palavra por cliente, os números são a média delas."
+                  : undefined
+              }
+            >
+              {linhasDoRanking.length === 0 ? (
+                <p className="dash-vazio-ranking">
+                  Ainda não há medição de posição. A medição é feita a cada 15 dias, numa grade de pontos ao redor do endereço de cada cliente, para as palavras de busca combinadas com a equipe. Quando a primeira chegar,
+                  aqui aparece em que posição cada perfil está e se está subindo ou caindo.
+                </p>
+              ) : (
+                <QuadroDoRanking linhas={linhasDoRanking} semMedicao={semMedicaoDoRanking} />
+              )}
             </CartaoDoPainel>
           </div>
         </>
