@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   agruparPorDia,
   comparar,
+  contarAcoes,
   diaCurto,
   diasEntre,
   fraseDaVariacao,
@@ -12,9 +13,13 @@ import {
   marcasDasAcoes,
   mediaMovel,
   origensDasAparicoes,
+  passoDoCalor,
   podeComparar,
+  porCemAparicoes,
+  projetar,
   reputacaoMaisRecente,
   resumirTermos,
+  semanasDosDias,
   serieDiaria,
   somar,
   somarDiasNaData,
@@ -293,4 +298,109 @@ test("agrupar por dia não altera a lista original", () => {
   const original = [dia("2026-11-02", { busca_cel: 4 }), dia("2026-11-02", { busca_cel: 6 })];
   agruparPorDia(original);
   assert.equal(original[0].busca_cel, 4);
+});
+
+
+// ---------------------------------------------------------------------------
+// Projeção
+// ---------------------------------------------------------------------------
+const aparicoes = (d: DiaDesempenho) => d.busca_cel;
+
+test("projeção: ritmo constante dá o mesmo valor no esperado, no mínimo e no máximo", () => {
+  const p = projetar(dias("2026-11-23", 28, 10), "2026-11-23", aparicoes);
+  assert.deepEqual(p, { esperado: 300, minimo: 300, maximo: 300, horizonte: 30, baseEmDias: 14 });
+});
+
+test("projeção: o esperado usa os últimos 14 dias, não os 28", () => {
+  // 14 dias a 10 e depois 14 dias a 20 (os mais recentes)
+  const serie = [...dias("2026-11-09", 14, 10), ...dias("2026-11-23", 14, 20)];
+  const p = projetar(serie, "2026-11-23", aparicoes);
+  assert.ok(p);
+  assert.equal(p.esperado, 600);
+  assert.equal(p.maximo, 600);
+  assert.equal(p.minimo, 300);
+});
+
+test("projeção: a faixa sempre envolve o esperado", () => {
+  const serie = dias("2026-11-23", 28, 0).map((d, i) => ({ ...d, busca_cel: [5, 30, 8, 22, 9, 40, 3][i % 7] + i }));
+  const p = projetar(serie, "2026-11-23", aparicoes);
+  assert.ok(p);
+  assert.ok(p.minimo <= p.esperado && p.esperado <= p.maximo);
+});
+
+test("projeção: sem 14 dias seguidos até o último dia, não projeta", () => {
+  assert.equal(projetar(dias("2026-11-23", 13, 10), "2026-11-23", aparicoes), null);
+  const comBuraco = dias("2026-11-23", 20, 10).filter((d) => d.dia !== "2026-11-18");
+  assert.equal(projetar(comBuraco, "2026-11-23", aparicoes), null);
+});
+
+test("projeção: com só 14 dias já projeta, com faixa das médias que existem", () => {
+  const p = projetar(dias("2026-11-23", 14, 4), "2026-11-23", aparicoes);
+  assert.ok(p);
+  assert.equal(p.esperado, 120);
+});
+
+// ---------------------------------------------------------------------------
+// Taxa por 100 aparições
+// ---------------------------------------------------------------------------
+test("por 100 aparições: 5 ligações em 200 aparições é 2,5", () => {
+  const t = somar([dia("2026-11-01", { busca_cel: 200, ligacoes: 5, rotas: 3, cliques_site: 20 })]);
+  assert.deepEqual(porCemAparicoes(t), { ligacoes: 2.5, rotas: 1.5, cliques_site: 10 });
+});
+
+test("por 100 aparições: base pequena não vira taxa", () => {
+  const t = somar([dia("2026-11-01", { busca_cel: 99, ligacoes: 5 })]);
+  assert.equal(porCemAparicoes(t), null);
+});
+
+// ---------------------------------------------------------------------------
+// Semana a semana
+// ---------------------------------------------------------------------------
+test("semanas: blocos de 7 dias andando para trás, do mais antigo para o mais novo", () => {
+  const semanas = semanasDosDias(dias("2026-11-23", 27, 10), "2026-11-23");
+  assert.deepEqual(
+    semanas.map((s) => [s.de, s.ate, s.total, s.completa]),
+    [
+      ["2026-10-27", "2026-11-02", 60, false], // só 28/10 a 02/11: seis dias
+      ["2026-11-03", "2026-11-09", 70, true],
+      ["2026-11-10", "2026-11-16", 70, true],
+      ["2026-11-17", "2026-11-23", 70, true],
+    ],
+  );
+});
+
+test("semanas: a mais antiga pela metade vem marcada como incompleta e sem dado nenhum não entra", () => {
+  const semanas = semanasDosDias(dias("2026-11-23", 10, 10), "2026-11-23");
+  assert.equal(semanas.length, 2);
+  assert.equal(semanas[0].completa, false);
+  assert.equal(semanas[0].total, 30);
+  assert.equal(semanas[1].completa, true);
+});
+
+test("calor: abaixo, na média e acima da média do próprio perfil", () => {
+  assert.equal(passoDoCalor(50, 100), 1);
+  assert.equal(passoDoCalor(90, 100), 2);
+  assert.equal(passoDoCalor(100, 100), 3);
+  assert.equal(passoDoCalor(110, 100), 4);
+  assert.equal(passoDoCalor(150, 100), 5);
+  assert.equal(passoDoCalor(5, 0), 3);
+});
+
+// ---------------------------------------------------------------------------
+// Trabalho feito
+// ---------------------------------------------------------------------------
+test("contar ações: por grupo, só dentro do intervalo, sem falhas nem o que não muda o perfil", () => {
+  const eventos = [
+    { ocorreu_em: "2026-11-10T12:00:00Z", tipo: "foto", ok: true },
+    { ocorreu_em: "2026-11-11T12:00:00Z", tipo: "foto", ok: true },
+    { ocorreu_em: "2026-11-11T13:00:00Z", tipo: "resposta", ok: true },
+    { ocorreu_em: "2026-11-11T14:00:00Z", tipo: "post", ok: false },
+    { ocorreu_em: "2026-11-11T15:00:00Z", tipo: "analise", ok: true },
+    { ocorreu_em: "2026-11-01T12:00:00Z", tipo: "foto", ok: true },
+  ];
+  const c = contarAcoes(eventos, "2026-11-10", "2026-11-12", (i) => i.slice(0, 10), (t) => (t === "foto" ? "Fotos" : "Respostas"));
+  assert.deepEqual([...c.entries()], [
+    ["Fotos", 2],
+    ["Respostas", 1],
+  ]);
 });

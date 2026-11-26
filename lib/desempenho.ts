@@ -263,6 +263,112 @@ export function marcasDasAcoes(eventos: { ocorreu_em: string; tipo: string; ok: 
 }
 
 // ---------------------------------------------------------------------------
+// Projeção: o que acontece nos próximos dias SE o ritmo recente continuar (uma estimativa, não uma promessa)
+// ---------------------------------------------------------------------------
+export const DIAS_DA_BASE_DA_PROJECAO = 14;
+export const DIAS_DA_PROJECAO = 30;
+export type Projecao = { esperado: number; minimo: number; maximo: number; horizonte: number; baseEmDias: number };
+
+// Esperado: a média diária dos últimos 14 dias vezes o horizonte. Faixa: da pior à melhor média de 7 dias dos últimos 28 dias,
+// que é o quanto o ritmo variou de verdade. Sem 14 dias seguidos até o último dia com número, não projeta.
+export function projetar(dias: DiaDesempenho[], ate: string, valor: (d: DiaDesempenho) => number, horizonte = DIAS_DA_PROJECAO): Projecao | null {
+  const porDia = new Map(dias.map((d) => [d.dia, valor(d)]));
+  const base = DIAS_DA_BASE_DA_PROJECAO;
+  let soma = 0;
+  for (let i = 0; i < base; i++) {
+    const v = porDia.get(somarDiasNaData(ate, -i));
+    if (v === undefined) return null;
+    soma += v;
+  }
+  const medias: number[] = [];
+  for (let fim = 0; fim <= 21; fim++) {
+    let s = 0;
+    let completa = true;
+    for (let k = 0; k < 7; k++) {
+      const v = porDia.get(somarDiasNaData(ate, -(fim + k)));
+      if (v === undefined) {
+        completa = false;
+        break;
+      }
+      s += v;
+    }
+    if (completa) medias.push(s / 7);
+  }
+  const ritmo = soma / base;
+  return {
+    esperado: Math.round(ritmo * horizonte),
+    minimo: Math.round(Math.min(...medias, ritmo) * horizonte),
+    maximo: Math.round(Math.max(...medias, ritmo) * horizonte),
+    horizonte,
+    baseEmDias: base,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// De cada 100 aparições, quantas viraram ligação, pedido de rota ou clique no site
+// ---------------------------------------------------------------------------
+export const BASE_MINIMA_DE_APARICOES_PARA_TAXA = 100;
+export type TaxaPorCem = { ligacoes: number; rotas: number; cliques_site: number };
+
+export function porCemAparicoes(t: Totais): TaxaPorCem | null {
+  if (t.aparicoes < BASE_MINIMA_DE_APARICOES_PARA_TAXA) return null;
+  const por100 = (n: number) => Math.round((n / t.aparicoes) * 1000) / 10;
+  return { ligacoes: por100(t.ligacoes), rotas: por100(t.rotas), cliques_site: por100(t.cliques_site) };
+}
+
+// ---------------------------------------------------------------------------
+// Semana a semana (mapa de calor): cada semana contra a média do próprio perfil
+// ---------------------------------------------------------------------------
+export type Semana = { de: string; ate: string; total: number; completa: boolean };
+
+// Blocos de 7 dias andando para trás a partir do último dia com número; do mais antigo para o mais novo.
+// Semana sem nenhum dia não entra; semana pela metade entra marcada como incompleta.
+export function semanasDosDias(dias: DiaDesempenho[], ate: string, quantas = 8): Semana[] {
+  const semanas: Semana[] = [];
+  for (let i = 0; i < quantas; i++) {
+    const fim = somarDiasNaData(ate, -7 * i);
+    const ini = somarDiasNaData(fim, -6);
+    const dentro = dias.filter((d) => d.dia >= ini && d.dia <= fim);
+    const diasComDado = new Set(dentro.map((d) => d.dia)).size;
+    if (diasComDado === 0) break;
+    semanas.push({ de: ini, ate: fim, total: somar(dentro).aparicoes, completa: diasComDado === 7 });
+  }
+  return semanas.reverse();
+}
+
+// 1 = bem abaixo da média do perfil, 3 = na média, 5 = bem acima
+export function passoDoCalor(valor: number, media: number): 1 | 2 | 3 | 4 | 5 {
+  if (media <= 0) return 3;
+  const r = valor / media;
+  if (r < 0.8) return 1;
+  if (r < 0.95) return 2;
+  if (r < 1.05) return 3;
+  if (r < 1.2) return 4;
+  return 5;
+}
+
+// ---------------------------------------------------------------------------
+// Trabalho feito: quantas ações em cada grupo, num intervalo de dias
+// ---------------------------------------------------------------------------
+export function contarAcoes(
+  eventos: { ocorreu_em: string; tipo: string; ok: boolean }[],
+  de: string,
+  ate: string,
+  diaDe: (instante: string) => string,
+  grupoDe: (tipo: string) => string,
+): Map<string, number> {
+  const contagem = new Map<string, number>();
+  for (const e of eventos) {
+    if (!e.ok || SEM_EFEITO_NO_PERFIL.has(e.tipo)) continue;
+    const dia = diaDe(e.ocorreu_em);
+    if (dia < de || dia > ate) continue;
+    const g = grupoDe(e.tipo);
+    contagem.set(g, (contagem.get(g) ?? 0) + 1);
+  }
+  return contagem;
+}
+
+// ---------------------------------------------------------------------------
 // Reputação: a leitura mais recente de cada cliente
 // ---------------------------------------------------------------------------
 export function reputacaoMaisRecente(lista: Reputacao[]): Map<string, Reputacao> {
