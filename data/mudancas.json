@@ -1,5 +1,22 @@
 [
   {
+    "feito_em": "2026-11-27T17:08:00-03:00",
+    "titulo": "Ótica Sergipe: perfil novo ligado ao painel e ajustado",
+    "resumo": "O perfil novo da Sergipe no Google passou a ser o oficial no painel e já recebeu o mesmo padrão das outras óticas: categorias adicionais, serviços, descrição com palavras-chave e a primeira foto. A rotina da madrugada agora cuida dela como dos demais clientes.",
+    "itens": [
+      "Categorias adicionais: Loja de óculos de sol e Fornecedor de lentes de contato",
+      "26 serviços com descrição, no mesmo padrão das outras óticas",
+      "Descrição nova com palavras-chave de Londrina, óculos de grau, óculos de sol e lentes",
+      "1 foto na galeria (mostruário de armações), enviada a partir do link do Drive",
+      "Entra na rotina das 02:37: respostas, avaliações ruins, desempenho e postagens"
+    ],
+    "como_testar": "Abra Clientes e a Ótica Sergipe: a aba Histórico deve mostrar 4 ações de hoje (categorias, serviços, descrição e foto), todas conferidas no Google. Na aba Prévia, o perfil deve mostrar 26 serviços e a descrição nova depois da próxima leitura da rotina.",
+    "pendente": "Vale na rotina de 28/11, às 02:37. O Google pode levar alguns dias para mostrar as mudanças no Maps.",
+    "tipo": "dados",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-27T14:25:00-03:00",
     "titulo": "Nova tela Avaliações ruins, com aviso no Painel",
     "resumo": "Todas as avaliações ruins dos clientes ficam numa tela só, da mais grave para a menos grave, com o motivo do aviso. A equipe marca cada uma como tratada e diz como (respondida pelo dono, denunciada ao Google ou deixada como está), e pode reabrir.",
