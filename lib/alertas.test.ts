@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { MAX_FALHAS, calcularAtencao, nadaPedeAtencao } from "./alertas.ts";
+import { MAX_AVALIACOES_RUINS, MAX_FALHAS, calcularAtencao, nadaPedeAtencao } from "./alertas.ts";
 import { montarSemana } from "./semana.ts";
 
 const evento = (
@@ -107,4 +107,38 @@ test("tudo em ordem: nada pede atenção", () => {
   const a = calcularAtencao(entrada([evento("a", HOJE, { cliente_id: "c1" })]));
   assert.equal(nadaPedeAtencao(a), true);
   assert.equal(nadaPedeAtencao(calcularAtencao(entrada([]))), false);
+});
+
+const ruim = (id: string, estrelas = 1) => ({
+  id,
+  cliente_id: "c1",
+  review_id: `r-${id}`,
+  avaliador: `Pessoa ${id}`,
+  estrelas,
+  texto: null,
+  avaliada_em: "2026-11-17",
+  motivo: "nota" as const,
+  motivo_detalhe: null,
+  situacao: "nova" as const,
+  detectada_em: "2026-11-18T05:40:00Z",
+  tratada_em: null,
+  tratada_por: null,
+  desfecho: null,
+});
+
+test("avaliação ruim sem tratar pede atenção, mesmo com a rotina em dia", () => {
+  const a = calcularAtencao(entrada([evento("a", HOJE)], { avaliacoesRuins: [ruim("x")] }));
+  assert.equal(a.avaliacoesRuins.total, 1);
+  assert.equal(nadaPedeAtencao(a), false);
+});
+
+test("sem alerta de avaliação, o total é zero", () => {
+  assert.deepEqual(calcularAtencao(entrada([evento("a", HOJE)])).avaliacoesRuins, { total: 0, recentes: [] });
+});
+
+test("só as primeiras avaliações ruins são listadas, mas o total conta todas", () => {
+  const muitas = Array.from({ length: 8 }, (_, i) => ruim(`r${i}`));
+  const a = calcularAtencao(entrada([evento("a", HOJE)], { avaliacoesRuins: muitas }));
+  assert.equal(a.avaliacoesRuins.total, 8);
+  assert.equal(a.avaliacoesRuins.recentes.length, MAX_AVALIACOES_RUINS);
 });

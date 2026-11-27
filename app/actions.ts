@@ -8,6 +8,7 @@ import { modoDemonstracao } from "@/lib/ambiente";
 import { supabaseServidor } from "@/lib/supabase";
 import type { Resultado } from "@/lib/acoes-tipos";
 import { conferirEntrada, conferirEscolha, type Conferida, type Resposta } from "@/lib/respostas";
+import { limparDesfecho } from "@/lib/avaliacoes-ruins";
 import { conferirNumeros, eClientePadrao } from "@/lib/rotina";
 import type { PayloadApprove, PayloadChoose, PayloadInput } from "@/lib/tipos";
 
@@ -19,6 +20,44 @@ const PAPEIS = ["admin", "editor", "leitura"] as const;
 
 function atualizar() {
   revalidatePath("/", "layout");
+}
+
+// ---------------------------------------------------------------------------
+// Avaliações ruins: a equipe marca como tratada (e diz como) ou reabre
+// ---------------------------------------------------------------------------
+export async function tratarAlertaAvaliacao(id: string, desfecho: string): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return { erro: "Alerta inválido." };
+  const texto = limparDesfecho(desfecho);
+  if (!texto) return { erro: "Conte em poucas palavras como foi tratada (por exemplo: denunciada ao Google)." };
+  const sb = await supabaseServidor();
+  const { data: usuario } = await sb.auth.getUser();
+  const { data, error } = await sb
+    .from("alertas_avaliacao")
+    .update({ situacao: "tratada", tratada_em: new Date().toISOString(), tratada_por: usuario.user?.email ?? null, desfecho: texto })
+    .eq("id", id)
+    .eq("situacao", "nova")
+    .select("id");
+  if (error) return { erro: error.message };
+  if (!data?.length) return { erro: "Sem permissão ou este alerta já foi tratado. Atualize a página." };
+  atualizar();
+  return { ok: true };
+}
+
+export async function reabrirAlertaAvaliacao(id: string): Promise<Resultado> {
+  if (modoDemonstracao()) return DEMO;
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return { erro: "Alerta inválido." };
+  const sb = await supabaseServidor();
+  const { data, error } = await sb
+    .from("alertas_avaliacao")
+    .update({ situacao: "nova", tratada_em: null, tratada_por: null, desfecho: null })
+    .eq("id", id)
+    .eq("situacao", "tratada")
+    .select("id");
+  if (error) return { erro: error.message };
+  if (!data?.length) return { erro: "Sem permissão ou este alerta já foi reaberto. Atualize a página." };
+  atualizar();
+  return { ok: true };
 }
 
 // ---------------------------------------------------------------------------

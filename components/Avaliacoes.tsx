@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { responderAvaliacao } from "@/app/actions";
+import { Estrelas } from "@/components/Estrelas";
 import { dataCurta } from "@/lib/rotulos";
 import type { Avaliacao, Pendencia, PayloadApprove } from "@/lib/tipos";
 
@@ -9,17 +10,6 @@ type Andamento = Record<string, { acao: "publicar" | "revisao"; conteudo_id?: st
 
 const LIMITE = 4096; // tamanho máximo de uma resposta no Google
 const TEXTO_CURTO = 320;
-
-function Estrelas({ n }: { n: number }) {
-  return (
-    <span className={n <= 2 ? "estrelas estrelas-baixa" : "estrelas"} role="img" aria-label={`${n} de 5 estrelas`}>
-      <span aria-hidden="true">
-        {"★".repeat(n)}
-        <span className="estrelas-vazias">{"★".repeat(5 - n)}</span>
-      </span>
-    </span>
-  );
-}
 
 function diasSemResposta(iso: string) {
   const dias = Math.max(0, Math.floor((Date.now() - Date.parse(iso)) / 86400000));

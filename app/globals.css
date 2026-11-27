@@ -4661,3 +4661,65 @@ input[type="radio"] {
     break-inside: avoid;
   }
 }
+
+
+/* ---------- Avaliações ruins ---------- */
+
+.alerta-resumo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.25rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.alerta-cliente {
+  margin-bottom: 2rem;
+}
+.alerta-lista {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 50rem;
+}
+/* A que espera decisão tem contorno preto; a tratada fica mais discreta (sem depender só de cor) */
+.alerta-avaliacao {
+  border-color: var(--preto);
+}
+.alerta-tratada {
+  border-color: var(--linha-forte);
+  background: transparent;
+}
+.alerta-motivo {
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--linha-forte);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.alerta-porque {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+.alerta-porque strong {
+  color: var(--tinta);
+}
+.alerta-sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.alerta-avaliacao .avaliacao-resposta input[type="text"] {
+  width: 100%;
+}
+.avaliacao-feita p {
+  margin: 0 0 0.3rem;
+}
+@media (max-width: 720px) {
+  .alerta-lista {
+    max-width: none;
+  }
+  .alerta-sugestoes .chip {
+    min-height: 2.5rem;
+  }
+}

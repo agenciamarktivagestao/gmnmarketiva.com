@@ -17,6 +17,8 @@ import type { PerfilLido } from "./perfil";
 import { perfilDemonstracao } from "./perfil-demo";
 import { TOKEN_DEMO, lerRespostaPublica } from "./acompanhamento";
 import type { Acompanhamento, LinkDoCliente } from "./acompanhamento";
+import { alertasDeDemonstracao } from "./avaliacoes-ruins-demo";
+import type { AlertaAvaliacao } from "./avaliacoes-ruins";
 import { diaChave, paraOCliente } from "./semana";
 import { supabasePublico, supabaseServidor } from "./supabase";
 import type {
@@ -393,6 +395,32 @@ export async function listarConteudos(): Promise<Conteudo[]> {
     .order("criado_em", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Conteudo[]) ?? [];
+}
+
+// ---------------------------------------------------------------------------
+// Alertas de avaliação ruim (a rotina grava; a equipe trata)
+// ---------------------------------------------------------------------------
+const COLUNAS_ALERTA =
+  "id,cliente_id,review_id,avaliador,estrelas,texto,avaliada_em,motivo,motivo_detalhe,situacao,detectada_em,tratada_em,tratada_por,desfecho";
+
+export async function listarAlertasAvaliacao(): Promise<AlertaAvaliacao[]> {
+  if (modoDemonstracao()) return alertasDeDemonstracao(demoClientes().map((c) => c.id));
+  const sb = await supabaseServidor();
+  const { data, error } = await sb.from("alertas_avaliacao").select(COLUNAS_ALERTA).order("detectada_em", { ascending: false }).limit(500);
+  if (error) throw new Error(error.message);
+  return (data as AlertaAvaliacao[]) ?? [];
+}
+
+// Só quantas esperam decisão (para o selo do menu): não pode derrubar a página se a tabela ainda não existir
+export async function contarAlertasAvaliacao(): Promise<number> {
+  if (modoDemonstracao()) return alertasDeDemonstracao(demoClientes().map((c) => c.id)).filter((a) => a.situacao === "nova").length;
+  try {
+    const sb = await supabaseServidor();
+    const { count, error } = await sb.from("alertas_avaliacao").select("id", { count: "exact", head: true }).eq("situacao", "nova");
+    return error ? 0 : (count ?? 0);
+  } catch {
+    return 0;
+  }
 }
 
 // ---------------------------------------------------------------------------

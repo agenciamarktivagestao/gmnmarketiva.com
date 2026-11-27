@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const LINKS = [
   { href: "/", nome: "Painel" },
   { href: "/pendencias", nome: "Pendências" },
+  { href: "/avaliacoes-ruins", nome: "Avaliações ruins" },
   { href: "/conteudo", nome: "Conteúdo" },
   { href: "/diretrizes", nome: "Diretrizes" },
   { href: "/semana", nome: "Últimos 7 dias" },
@@ -16,7 +17,7 @@ const LINKS = [
   { href: "/novidades", nome: "Novidades" },
 ];
 
-export function NavLinks({ novidades = 0 }: { novidades?: number }) {
+export function NavLinks({ novidades = 0, avaliacoesRuins = 0 }: { novidades?: number; avaliacoesRuins?: number }) {
   const atual = usePathname();
   return (
     <nav aria-label="Principal" className="nav">
@@ -25,6 +26,14 @@ export function NavLinks({ novidades = 0 }: { novidades?: number }) {
         return (
           <Link key={l.href} href={l.href} aria-current={ativo ? "page" : undefined}>
             {l.nome}
+            {l.href === "/avaliacoes-ruins" && avaliacoesRuins > 0 && (
+              <>
+                <span className="nav-selo" aria-hidden="true">
+                  {avaliacoesRuins}
+                </span>
+                <span className="sr-only"> ({avaliacoesRuins === 1 ? "1 espera decisão" : `${avaliacoesRuins} esperam decisão`})</span>
+              </>
+            )}
             {l.href === "/novidades" && novidades > 0 && (
               <>
                 <span className="nav-selo" aria-hidden="true">

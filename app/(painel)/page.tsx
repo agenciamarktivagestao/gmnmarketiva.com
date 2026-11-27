@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Atencao } from "@/components/Atencao";
+import { separarAlertas } from "@/lib/avaliacoes-ruins";
 import { Fase } from "@/components/Fase";
 import { Matriz } from "@/components/Matriz";
 import {
   contarNovidadesNaoVistas,
   lerAjustesRotina,
   listarAjustesClientes,
+  listarAlertasAvaliacao,
   listarClientes,
   listarConteudos,
   listarDiagnosticos,
@@ -39,6 +41,13 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
     listarEventosDesde(inicioDaBusca(agora)),
   ]);
   const semana = montarSemana(eventosDaSemana, agora);
+  // Avaliações ruins sem decisão: é um complemento, então se a leitura falhar (tabela ainda não criada, por exemplo) o Painel segue sem elas
+  const alertasAvaliacao = await listarAlertasAvaliacao().catch(() => []);
+  const idsDosClientes = new Set(clientes.map((c) => c.id));
+  const avaliacoesRuins = separarAlertas(
+    alertasAvaliacao.filter((a) => idsDosClientes.has(a.cliente_id)),
+    agora,
+  ).novas;
   // Ajustes da rotina (aviso de rotina pausada e clientes pausados): é um complemento, então se a leitura falhar o Painel segue sem eles
   const [ajustes, ajustesClientes] = await Promise.all([lerAjustesRotina().catch(() => null), listarAjustesClientes().catch(() => [])]);
   const rotinaPausada = ajustes ? !ajustes.ativa : false;
@@ -49,6 +58,7 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
     pausados: new Set(ajustesClientes.filter((a) => a.pausada).map((a) => a.cliente_id)),
     rotinaAtiva: !rotinaPausada,
     passouDoPrazo: horaEmBrasilia >= HORA_LIMITE_DA_ROTINA,
+    avaliacoesRuins,
   });
   const textosEsperam = conteudos.filter((c) => c.status === "rascunho").length;
   const imagensNaFila = midias.filter((m) => m.status === "na_fila").length;
@@ -159,7 +169,9 @@ export default async function Painel({ searchParams }: { searchParams: Promise<{
         )}
       </section>
 
-      {!rotinaPausada && <Atencao atencao={atencao} clientes={clientes} dias={semana.dias} />}
+      {(!rotinaPausada || atencao.avaliacoesRuins.total > 0) && (
+        <Atencao atencao={atencao} clientes={clientes} dias={semana.dias} soAvaliacoes={rotinaPausada} />
+      )}
 
       {resumoVisivel.length > 0 && (
         <p className="tambem-esperam">

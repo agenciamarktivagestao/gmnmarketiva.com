@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DIAS_DE_FALHA, nadaPedeAtencao } from "@/lib/alertas";
+import { motivoRotulo } from "@/lib/avaliacoes-ruins";
 import type { Atencao as DadosDeAtencao } from "@/lib/alertas";
 import { diaChave, quandoFoi } from "@/lib/semana";
 import type { Dia } from "@/lib/semana";
@@ -7,9 +8,23 @@ import type { Cliente } from "@/lib/tipos";
 
 const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
 
+const notaPorExtenso = (n: number) => (n === 1 ? "1 estrela" : `${n} estrelas`);
+
 // O que pede atenção no Painel. Quando não há nada, uma linha só diz que está tudo em ordem.
-export function Atencao({ atencao, clientes, dias }: { atencao: DadosDeAtencao; clientes: Cliente[]; dias: Dia[] }) {
+// soAvaliacoes: com a rotina pausada, só as avaliações ruins entram (o resto é esperado quando ela está parada).
+export function Atencao({
+  atencao: dados,
+  clientes,
+  dias,
+  soAvaliacoes = false,
+}: {
+  atencao: DadosDeAtencao;
+  clientes: Cliente[];
+  dias: Dia[];
+  soAvaliacoes?: boolean;
+}) {
   const porId = new Map(clientes.map((c) => [c.id, c]));
+  const atencao: DadosDeAtencao = soAvaliacoes ? { ...dados, rotina: null, falhas: { total: 0, recentes: [] }, semAcao: [] } : dados;
 
   if (nadaPedeAtencao(atencao)) {
     return (
@@ -20,13 +35,36 @@ export function Atencao({ atencao, clientes, dias }: { atencao: DadosDeAtencao; 
     );
   }
 
-  const { rotina, falhas, semAcao } = atencao;
+  const { rotina, falhas, semAcao, avaliacoesRuins } = atencao;
   const clientesSemAcao = semAcao.flatMap((id) => porId.get(id) ?? []);
 
   return (
     <section className="atencao" aria-labelledby="t-atencao">
       <h2 id="t-atencao">Pede atenção</h2>
       <ul className="atencao-lista">
+        {avaliacoesRuins.total > 0 && (
+          <li className="atencao-alto">
+            <p className="atencao-titulo">
+              {plural(avaliacoesRuins.total, "avaliação ruim espera", "avaliações ruins esperam")} a sua decisão.
+            </p>
+            <ul className="atencao-itens">
+              {avaliacoesRuins.recentes.map((a) => {
+                const cli = porId.get(a.cliente_id);
+                return (
+                  <li key={a.id}>
+                    {cli ? <Link href="/avaliacoes-ruins">{cli.nome}</Link> : "Cliente"}: {notaPorExtenso(a.estrelas)} de {a.avaliador}{" "}
+                    <span className="atencao-quando">({motivoRotulo(a.motivo).toLowerCase()})</span>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="atencao-detalhe">
+              {avaliacoesRuins.total > avaliacoesRuins.recentes.length && `E mais ${avaliacoesRuins.total - avaliacoesRuins.recentes.length}. `}
+              A rotina não responde essas avaliações: você decide como recorrer. <Link href="/avaliacoes-ruins">Abrir Avaliações ruins</Link>
+            </p>
+          </li>
+        )}
+
         {rotina && (
           <li className="atencao-alto">
             <p className="atencao-titulo">

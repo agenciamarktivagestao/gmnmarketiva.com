@@ -1,11 +1,13 @@
+import type { AlertaAvaliacao } from "./avaliacoes-ruins";
 import type { Semana } from "./semana";
 import type { Evento } from "./tipos";
 
-// O que pede atenção no Painel: a rotina que não registrou nada, ações que falharam e clientes sem nenhuma ação.
+// O que pede atenção no Painel: avaliações ruins sem decisão, a rotina que não registrou nada, ações que falharam e clientes sem nenhuma ação.
 // Recebe a semana já montada (ver semana.ts). Este arquivo só importa tipos de outros: os testes rodam direto no Node.
 
 export const DIAS_DE_FALHA = 3; // uma falha mais antiga que isso deixa de aparecer
 export const MAX_FALHAS = 5; // quantas falhas listar (o total sempre é contado)
+export const MAX_AVALIACOES_RUINS = 5; // quantas avaliações ruins listar (o total sempre é contado)
 export const HORA_LIMITE_DA_ROTINA = 5; // a rotina termina até as 04:30; depois das 05:00 ela já devia ter registrado a noite
 
 export type Atencao = {
@@ -13,9 +15,12 @@ export type Atencao = {
   rotina: { noites: number; ultima: string | null } | null;
   falhas: { total: number; recentes: Evento[] };
   semAcao: string[]; // ids dos clientes sem nenhuma ação nos últimos 7 dias
+  // avaliações ruins que a rotina achou e a equipe ainda não tratou (as mais urgentes primeiro; o total sempre é contado)
+  avaliacoesRuins: { total: number; recentes: AlertaAvaliacao[] };
 };
 
-export const nadaPedeAtencao = (a: Atencao) => a.rotina === null && a.falhas.total === 0 && a.semAcao.length === 0;
+export const nadaPedeAtencao = (a: Atencao) =>
+  a.rotina === null && a.falhas.total === 0 && a.semAcao.length === 0 && a.avaliacoesRuins.total === 0;
 
 export function calcularAtencao(entrada: {
   semana: Semana; // montarSemana(...): sete dias, do mais antigo até hoje
@@ -23,8 +28,9 @@ export function calcularAtencao(entrada: {
   pausados?: ReadonlySet<string>; // clientes pausados na tela Rotina: ficar sem ação é esperado
   rotinaAtiva: boolean;
   passouDoPrazo: boolean; // já passou das 05:00 de hoje em Brasília (HORA_LIMITE_DA_ROTINA)
+  avaliacoesRuins?: AlertaAvaliacao[]; // alertas ainda sem tratar, já do mais urgente ao menos urgente (ver separarAlertas)
 }): Atencao {
-  const { semana, clienteIds, pausados, rotinaAtiva, passouDoPrazo } = entrada;
+  const { semana, clienteIds, pausados, rotinaAtiva, passouDoPrazo, avaliacoesRuins = [] } = entrada;
   const chaves = semana.dias.map((d) => d.chave);
 
   // Rotina: a última noite que ela devia ter registrado é a de hoje (depois do prazo) ou a de ontem
@@ -46,5 +52,10 @@ export function calcularAtencao(entrada: {
   const comAcao = new Set(semana.eventos.map((e) => e.cliente_id));
   const semAcao = clienteIds.filter((id) => !comAcao.has(id) && !pausados?.has(id));
 
-  return { rotina, falhas: { total: falhas.length, recentes: falhas.slice(0, MAX_FALHAS) }, semAcao };
+  return {
+    rotina,
+    falhas: { total: falhas.length, recentes: falhas.slice(0, MAX_FALHAS) },
+    semAcao,
+    avaliacoesRuins: { total: avaliacoesRuins.length, recentes: avaliacoesRuins.slice(0, MAX_AVALIACOES_RUINS) },
+  };
 }
