@@ -1,5 +1,38 @@
 [
   {
+    "feito_em": "2026-11-27T14:25:00-03:00",
+    "titulo": "Nova tela Avaliações ruins, com aviso no Painel",
+    "resumo": "Todas as avaliações ruins dos clientes ficam numa tela só, da mais grave para a menos grave, com o motivo do aviso. A equipe marca cada uma como tratada e diz como (respondida pelo dono, denunciada ao Google ou deixada como está), e pode reabrir.",
+    "itens": [
+      "Item novo no menu, com o número de avaliações esperando decisão",
+      "Aviso no topo do Painel, acima dos outros, com link para a tela",
+      "Cada cliente tem a sua seção: as que esperam decisão e as tratadas nos últimos 30 dias",
+      "Uso interno: não aparece no relatório nem no link público do cliente",
+      "Funciona no celular"
+    ],
+    "como_testar": "Abra o menu Avaliações ruins: devem aparecer 6 avaliações esperando decisão (3 da Ótica Av. Rio de Janeiro, 2 da Clínica Central Norte e 1 da Dra. Ana Luiza). Para testar, marque uma como tratada, escrevendo como, e reabra em seguida.",
+    "pendente": "Ainda não está no ar: espera a aprovação para publicar.",
+    "tipo": "painel",
+    "commit_sha": "94e44f9",
+    "autor": "Claude"
+  },
+  {
+    "feito_em": "2026-11-27T14:24:00-03:00",
+    "titulo": "Rotina da madrugada avisa avaliações ruins e não responde",
+    "resumo": "Toda noite a rotina olha as avaliações de todos os perfis. Quando acha uma de 3 estrelas ou menos, ou com comentário negativo mesmo com nota alta, ela não responde: guarda um alerta no painel e abre o relatório da manhã, aqui no Claude, com esse aviso.",
+    "itens": [
+      "Conta como ruim: nota 1, 2 ou 3, ou comentário negativo mesmo com 4 ou 5 estrelas",
+      "A rotina deixa de responder avaliações de 1 a 3 estrelas, até as de reclamação simples",
+      "O relatório da manhã começa com a linha ALERTA: cliente, estrelas, quem avaliou e se já tem resposta",
+      "As 6 avaliações ruins dos últimos 30 dias já foram carregadas no painel"
+    ],
+    "como_testar": "Amanhã de manhã, leia a primeira linha do relatório da rotina: ela diz se houve avaliações ruins novas e quantas seguem esperando decisão.",
+    "pendente": "Vale a partir da rotina de 28/11, às 02:37.",
+    "tipo": "rotina",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-27T11:00:00-03:00",
     "titulo": "Aline Ceccotti sai da operação",
     "resumo": "O cliente foi desativado no painel e pausado na rotina: sai da lista de clientes, do Desempenho e das tarefas da madrugada. O histórico fica guardado.",
