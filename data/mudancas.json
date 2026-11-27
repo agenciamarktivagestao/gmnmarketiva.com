@@ -11,7 +11,7 @@
       "Funciona no celular"
     ],
     "como_testar": "Abra o menu Avaliações ruins: devem aparecer 6 avaliações esperando decisão (3 da Ótica Av. Rio de Janeiro, 2 da Clínica Central Norte e 1 da Dra. Ana Luiza). Para testar, marque uma como tratada, escrevendo como, e reabra em seguida.",
-    "pendente": "Ainda não está no ar: espera a aprovação para publicar.",
+    "pendente": null,
     "tipo": "painel",
     "commit_sha": "94e44f9",
     "autor": "Claude"
