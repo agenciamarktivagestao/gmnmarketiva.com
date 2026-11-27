@@ -1,5 +1,20 @@
 [
   {
+    "feito_em": "2026-11-27T17:22:00-03:00",
+    "titulo": "Ótica Sergipe: capa e foto da fachada no Google",
+    "resumo": "O perfil da Sergipe ganhou uma capa horizontal com o letreiro Gouveia e uma segunda foto da fachada na galeria. As duas foram recortadas e ajustadas a partir das fotos que você mandou.",
+    "itens": [
+      "Capa: recorte horizontal (1280x720) da fachada, com o letreiro em destaque",
+      "Galeria: foto da fachada em retrato, categoria Exterior, sem o pedestre da esquerda",
+      "As duas aparecem no histórico da Sergipe, conferidas no Google"
+    ],
+    "como_testar": "Abra Clientes e a Ótica Sergipe: a aba Histórico deve mostrar duas ações de foto de hoje, conferidas. No Google Maps, a capa e a fachada podem levar algumas horas para aparecer.",
+    "pendente": "O Google pode levar algumas horas para mostrar as fotos no Maps.",
+    "tipo": "dados",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-27T17:08:00-03:00",
     "titulo": "Ótica Sergipe: perfil novo ligado ao painel e ajustado",
     "resumo": "O perfil novo da Sergipe no Google passou a ser o oficial no painel e já recebeu o mesmo padrão das outras óticas: categorias adicionais, serviços, descrição com palavras-chave e a primeira foto. A rotina da madrugada agora cuida dela como dos demais clientes.",
