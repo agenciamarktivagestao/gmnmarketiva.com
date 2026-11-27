@@ -1,5 +1,22 @@
 [
   {
+    "feito_em": "2026-11-26T22:20:00-03:00",
+    "titulo": "Posição no Google Maps por região (pronta para receber medições)",
+    "resumo": "O Desempenho ganhou o ranking regional: em que posição cada perfil aparece no Google Maps, por palavra-chave e por ponto da região (Londrina, Cambé, Ibiporã), e se subiu ou caiu desde a medição anterior.",
+    "itens": [
+      "Em cada cliente, o card \"Posição no Google Maps\" mostra um mapa de pontos por palavra-chave, com a posição em cada ponto, o percentual no top 3, a posição média e o histórico",
+      "Na visão geral, um quadro com todos os clientes lado a lado: no top 3, posição média e o que mudou desde a medição anterior",
+      "Só compara medições feitas com a mesma grade e o mesmo espaçamento; medições com muitos pontos sem leitura avisam em vez de comparar",
+      "A medição é feita a cada 15 dias, duas vezes por mês, e entra no painel depois de conferida",
+      "Funciona no celular e o mapa tem texto para leitor de tela"
+    ],
+    "como_testar": "Abra Desempenho, entre em um cliente e role até \"Posição no Google Maps\": por enquanto aparece o aviso de que ainda não há medição. Na visão geral, o quadro mostra a mesma mensagem.",
+    "pendente": "Falta a primeira medição. Ela depende da varredura feita no computador da agência (passo a passo em docs/ranking-varredura.md); até lá os mapas não aparecem.",
+    "tipo": "painel",
+    "commit_sha": "c01e9d1",
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-26T17:58:00-03:00",
     "titulo": "Desempenho ganha visual de painel, com projeção",
     "resumo": "As duas telas de Desempenho ficaram mais visuais: números grandes no topo, gráficos e mapa de calor em vez de tabelas soltas.",
