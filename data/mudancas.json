@@ -1,5 +1,20 @@
 [
   {
+    "feito_em": "2026-11-27T10:50:00-03:00",
+    "titulo": "Rotina da madrugada espera 4 dias para gravar o Desempenho",
+    "resumo": "O Google leva cerca de 4 dias para fechar cada dia: nos últimos dias ele ainda manda números parciais. A rotina agora grava os números só até 4 dias antes de hoje, para o painel não mostrar queda falsa.",
+    "itens": [
+      "Os números por dia passam a ir até hoje menos 4 (antes era hoje menos 3)",
+      "Nada muda no que a rotina escreve no Google nem na meta da noite",
+      "Os dias recentes são reescritos toda noite, então ficam certos quando o Google fecha o dia"
+    ],
+    "como_testar": "Amanhã (28/11) abra Desempenho: o último dia dos números deve ser 24/11 e avançar um dia a cada manhã.",
+    "pendente": "Vale a partir da rotina de 28/11, às 02:37.",
+    "tipo": "rotina",
+    "commit_sha": null,
+    "autor": "Claude"
+  },
+  {
     "feito_em": "2026-11-26T22:20:00-03:00",
     "titulo": "Posição no Google Maps por região (pronta para receber medições)",
     "resumo": "O Desempenho ganhou o ranking regional: em que posição cada perfil aparece no Google Maps, por palavra-chave e por ponto da região (Londrina, Cambé, Ibiporã), e se subiu ou caiu desde a medição anterior.",
